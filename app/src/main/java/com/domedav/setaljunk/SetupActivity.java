@@ -39,29 +39,40 @@ public class SetupActivity extends AppCompatActivity {
 		}
 		_pageCounter--;
 		_viewFlipper.showPrevious();
+		_viewFlipper.scrollTo(0, 0);
+		_gpsLayout.setVisibility(View.GONE);
+		_cameraLayout.setVisibility(View.GONE);
+		_stepsLayout.setVisibility(View.GONE);
 		if(_pageCounter == 0){
 			_nextButton.setVisibility(View.VISIBLE);
 			_nextButton.setOnClickListener(l -> {
-				_viewFlipper.showNext();
+				nextButtonClicked();
 			});
 		}
 	}
 	
 	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		onPermissionChanged(permissions, grantResults);
+	}
+	
+	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, int deviceId) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId);
-		if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
-			return;
-		}
-		for (var item: permissions) {
-			if(Objects.equals(item, AppPermissions.LOCATION)){
+		onPermissionChanged(permissions, grantResults);
+	}
+	
+	private void onPermissionChanged(@NonNull String[] permissions, @NonNull int[] grantResults){
+		for (int i = 0; i < permissions.length; i++) {
+			if(Objects.equals(permissions[i], AppPermissions.LOCATION) && grantResults[i] == PackageManager.PERMISSION_GRANTED){
 				_gpsLayout.setVisibility(View.GONE);
 			}
-			else if(Objects.equals(item, AppPermissions.CAMERA)){
+			else if(Objects.equals(permissions[i], AppPermissions.CAMERA) && grantResults[i] == PackageManager.PERMISSION_GRANTED){
 				_cameraLayout.setVisibility(View.GONE);
 			}
 			else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-				if(Objects.equals(item, AppPermissions.ACTIVITY_SENSOR)){
+				if(Objects.equals(permissions[i], AppPermissions.ACTIVITY_SENSOR) && grantResults[i] == PackageManager.PERMISSION_GRANTED){
 					_stepsLayout.setVisibility(View.GONE);
 				}
 			}
@@ -71,6 +82,10 @@ public class SetupActivity extends AppCompatActivity {
 			_nextButton.setOnClickListener(l -> {
 				proceedAppIfAllPerms();
 			});
+		}
+		if(hasAllNeededPerms() && AppPermissions.hasPermission(this, AppPermissions.CAMERA)){
+			// all permissions were given
+			proceedAppIfAllPerms();
 		}
 	}
 	
@@ -92,6 +107,10 @@ public class SetupActivity extends AppCompatActivity {
 		_stepsLayout = findViewById(R.id.steps_view);
 		_cameraLayout = findViewById(R.id.camera_view);
 		
+		_gpsLayout.setVisibility(View.GONE);
+		_cameraLayout.setVisibility(View.GONE);
+		_stepsLayout.setVisibility(View.GONE); // if these are active, they ruin the UI a littlebit
+		
 		_gpsButton = findViewById(R.id.gps_button);
 		_cameraButton = findViewById(R.id.camera_button);
 		_stepsButton = findViewById(R.id.steps_button);
@@ -110,26 +129,34 @@ public class SetupActivity extends AppCompatActivity {
 		_viewFlipper.setOutAnimation(this, android.R.anim.fade_out);
 		
 		_nextButton.setOnClickListener(v -> {
-			_viewFlipper.showNext();
-			_pageCounter++;
-			if(_pageCounter == 1){
-				_nextButton.setVisibility(View.INVISIBLE);
-				
-				if(AppPermissions.hasPermission(this, AppPermissions.LOCATION)){
-					_gpsLayout.setVisibility(View.GONE);
-				}
-				if(AppPermissions.hasPermission(this, AppPermissions.CAMERA)){
-					_cameraLayout.setVisibility(View.GONE);
-				}
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-					if(AppPermissions.hasPermission(this, AppPermissions.ACTIVITY_SENSOR)){
-						_stepsLayout.setVisibility(View.GONE);
-					}
-				}
-			}
+			nextButtonClicked();
 		}); // Pressing the next button, should bring the next page
 		
 		proceedAppIfAllPerms();
+	}
+	
+	void nextButtonClicked(){
+		_viewFlipper.showNext();
+		_pageCounter++;
+		_viewFlipper.scrollTo(0, 0);
+		_gpsLayout.setVisibility(View.VISIBLE);
+		_cameraLayout.setVisibility(View.VISIBLE);
+		_stepsLayout.setVisibility(View.VISIBLE);
+		if(_pageCounter == 1){
+			_nextButton.setVisibility(View.INVISIBLE);
+			
+			if(AppPermissions.hasPermission(this, AppPermissions.LOCATION)){
+				_gpsLayout.setVisibility(View.GONE);
+			}
+			if(AppPermissions.hasPermission(this, AppPermissions.CAMERA)){
+				_cameraLayout.setVisibility(View.GONE);
+			}
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+				if(AppPermissions.hasPermission(this, AppPermissions.ACTIVITY_SENSOR)){
+					_stepsLayout.setVisibility(View.GONE);
+				}
+			}
+		}
 	}
 	
 	private void proceedAppIfAllPerms(){
