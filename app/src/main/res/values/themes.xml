@@ -1,8 +1,41 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 	<!-- Base application theme. -->
-	<style name="Base.Theme.Sétáljunk" parent="Theme.Material3.DynamicColors.DayNight">
-	
-	</style>
+	<style name="Theme.Sétáljunk" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
 
-	<style name="Theme.Sétáljunk" parent="Base.Theme.Sétáljunk" />
+	</style>
+	
+	<style name="AppButtonStyle" parent="Widget.Material3.Button">
+		<item name="android:textColor">?attr/colorPrimary</item>
+		<item name="android:background">@drawable/button_background</item>
+		<item name="android:backgroundTint">?attr/colorPrimaryContainer</item>
+		<item name="rippleColor">?attr/colorOnPrimary</item>
+		<item name="android:paddingStart">24dp</item>
+		<item name="android:paddingEnd">24dp</item>
+		<item name="android:paddingTop">12dp</item>
+		<item name="android:paddingBottom">12dp</item>
+		<item name="android:textSize">18sp</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+	
+	<style name="AppLayoutStyle">
+		<item name="android:background">@drawable/rounded_background</item>
+		<item name="android:backgroundTint">?attr/colorSurfaceVariant</item>
+		<item name="android:paddingStart">12dp</item>
+		<item name="android:paddingEnd">12dp</item>
+		<item name="android:paddingTop">12dp</item>
+		<item name="android:paddingBottom">12dp</item>
+		<item name="android:gravity">center_vertical|fill_horizontal</item>
+		<item name="android:layout_gravity">center_vertical|fill_horizontal</item>
+	</style>
+	
+	<style name="AppImageViewStyle">
+		<item name="android:tint">?attr/colorPrimary</item>
+		<item name="android:paddingStart">8dp</item>
+		<item name="android:paddingEnd">8dp</item>
+		<item name="android:paddingTop">8dp</item>
+		<item name="android:paddingBottom">8dp</item>
+		<item name="android:gravity">center_vertical|fill_horizontal</item>
+		<item name="android:layout_gravity">center_vertical|fill_horizontal</item>
+	</style>
+	
 </resources>

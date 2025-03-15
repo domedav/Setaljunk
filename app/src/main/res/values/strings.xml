@@ -1,3 +1,19 @@
 <resources>
 	<string name="app_name">Sétáljunk</string>
+	
+	<string name="setup_page1_header">Leírás</string>
+	<string name="setup_page1_description">Ennek az alkalmazásnak az a lényege, hogy serkentse a napi mozgásodat.\nÍgy minden nap fog neked szólni, és te eltudod dönteni mennyit szeretnél az adott nap sétálni.\nAz app méri a te mozgási adataidat, így mindent nyomon tudsz követni.</string>
+	<string name="setup_proceed_description">Viszont mielőtt használhatnád az appot, meg kell adnod néhány engedélyt.</string>
+	<string name="setup_next_button">Tovább</string>
+	
+	<string name="setup_give_perms">Megadás</string>
+	<string name="setup_page2_header">Engedélyek</string>
+	<string name="setup_perm_gps">Tartózkodási hely</string>
+	<string name="setup_perm_gps_description">Erre az engedélyre azért van szükség, hiszen az applikáció nem tudná nyomonkövetni, hogy merre jársz.</string>
+	<string name="setup_perm_camera">Kamera</string>
+	<string name="setup_perm_camera_description">Erre az engedélyre azért van szükség, hogy be tudd scannelni a barátaid által megosztott QR-kódot.</string>
+	<string name="setup_perm_camera_description_optional">(Nem kötelező)</string>
+	<string name="setup_perm_steps">Lépésszámláló</string>
+	<string name="setup_perm_steps_description">Erre az engedélyre azért van szükség, hogy az app tudja, mennyi lépést tettél meg.</string>
+	
 </resources>
