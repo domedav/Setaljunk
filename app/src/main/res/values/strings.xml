@@ -16,4 +16,8 @@
 	<string name="setup_perm_steps">Lépésszámláló</string>
 	<string name="setup_perm_steps_description">Erre az engedélyre azért van szükség, hogy az app tudja, mennyi lépést tettél meg.</string>
 	
+	<string name="main_gps_missing_services">Kérlek kapcsold be az internetet, és a GPS-t!</string>
+	<string name="main_usage_helper">Válaszd ki a sétálni kívánt távolságot, majd nyomd meg a séta indítása gombot.</string>
+	<string name="main_seekbar_min_distance">100m</string>
+	<string name="main_seekbar_max_distance">5000m</string>
 </resources>

@@ -12,6 +12,11 @@ public class AppDataStore {
 		public static final String DATAKEY_HAS_SETUP = "SetupPrefsKeys_hasSetup";
 	}
 	
+	public static final class MainPrefsKeys{
+		public static final String STOREKEY = "MainPrefsKeys_SetupPrefs";
+		public static final String DATAKEY_RECENT_MAP_DISTANCE = "MainPrefsKeys_recentMapDistance";
+	}
+	
 	static Context _AppContext;
 	
 	/// Must be called, before use

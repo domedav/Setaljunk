@@ -18,7 +18,7 @@
 	</style>
 	
 	<style name="AppLayoutStyle">
-		<item name="android:background">@drawable/rounded_background</item>
+		<item name="android:background">@drawable/semitransparent_rounded_background</item>
 		<item name="android:backgroundTint">?attr/colorSurfaceVariant</item>
 		<item name="android:paddingStart">12dp</item>
 		<item name="android:paddingEnd">12dp</item>
@@ -36,6 +36,33 @@
 		<item name="android:paddingBottom">8dp</item>
 		<item name="android:gravity">center_vertical|fill_horizontal</item>
 		<item name="android:layout_gravity">center_vertical|fill_horizontal</item>
+	</style>
+	
+	<style name="AppImageButtonStyle" parent="Widget.AppCompat.ImageButton">
+		<item name="android:tint">?attr/colorPrimary</item>
+		<item name="android:background">@drawable/button_background</item>
+		<item name="android:backgroundTint">?attr/colorPrimaryContainer</item>
+		<item name="rippleColor">?attr/colorOnPrimary</item>
+		<item name="android:paddingStart">12dp</item>
+		<item name="android:paddingEnd">12dp</item>
+		<item name="android:paddingTop">12dp</item>
+		<item name="android:paddingBottom">12dp</item>
+	</style>
+	
+	<style name="AppImageButtonBigStyle" parent="AppImageButtonStyle">
+		<item name="android:paddingStart">20dp</item>
+		<item name="android:paddingEnd">20dp</item>
+		<item name="android:paddingTop">20dp</item>
+		<item name="android:paddingBottom">20dp</item>
+	</style>
+	
+	<style name="AppSeekbarStyle" parent="Widget.AppCompat.SeekBar">
+		<item name="android:thumbTint">?attr/colorPrimary</item>
+		<item name="android:progressDrawable">@drawable/seekbar_logic_drawable</item>
+		<item name="android:progressTint">?attr/colorPrimary</item>
+		<item name="android:progressBackgroundTint">?attr/colorSurfaceVariant</item>
+		<item name="android:thumb">@drawable/ic_thumb</item>
+		<item name="android:splitTrack">false</item>
 	</style>
 	
 </resources>

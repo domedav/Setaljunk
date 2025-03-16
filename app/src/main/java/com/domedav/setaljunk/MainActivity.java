@@ -1,22 +1,53 @@
 package com.domedav.setaljunk;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-
+import android.widget.FrameLayout;
+import android.widget.SeekBar;
+import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
 import com.domedav.setaljunk.permissions.AppPermissions;
 import com.domedav.setaljunk.sharedpreferences.AppDataStore;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Objects;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, SeekBar.OnSeekBarChangeListener {
 	
 	private static final String TAG = "MainActivity";
+	
+	private MapView _mapView;
+	private GoogleMap _googleMap;
+	private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+	
+	private static final int MAP_MIN_DISTANCE = 100;
+	private static final int MAP_MAX_DISTANCE = 5000;
+	private int _currentMeters = MAP_MIN_DISTANCE;
+	
+	private AppCompatSeekBar _mapSeekbar;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,5 +73,195 @@ public class MainActivity extends AppCompatActivity {
 			finish();
 			return;
 		}
+		
+		// Use recently used value
+		_currentMeters = AppDataStore.getData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_RECENT_MAP_DISTANCE, MAP_MIN_DISTANCE);
+		
+		_mapView = new MapView(getApplicationContext()); // need to initialize like this, so app doesnt crash, when no location permission
+		_mapView.setFocusable(false);
+		((FrameLayout)findViewById(R.id.map_container)).addView(
+				_mapView,
+				new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+		);
+		
+		_mapSeekbar = findViewById(R.id.map_zoom_seekbar);
+		_mapSeekbar.setMax(MAP_MAX_DISTANCE - MAP_MIN_DISTANCE);
+		_mapSeekbar.setProgress(_currentMeters, true);
+		
+		_mapSeekbar.setOnSeekBarChangeListener(this);
+		
+		
+		// Initialize the MapView
+		Bundle mapViewBundle = null;
+		if (savedInstanceState != null) {
+			mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+		}
+		
+		_mapView.onCreate(mapViewBundle);
+		_mapView.getMapAsync(this);
+	}
+	
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+	@Override
+	public void onMapReady(@NonNull GoogleMap googleMap) {
+		this._googleMap = googleMap;
+		if (!AppPermissions.hasPermission(this, AppPermissions.LOCATION)) { // no location permission, we cant use the maps
+			return;
+		}
+		LocationManager locationManager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+		var gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		var internet_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		
+		if(!gps_enabled || !internet_enabled){
+			Toast.makeText(getApplicationContext(), getString(R.string.main_gps_missing_services), Toast.LENGTH_LONG).show(); // alert user, that no gps or internet is available
+			return;
+		}
+		MapsInitializer.initialize(this);
+		
+		googleMap.setMyLocationEnabled(true); // show current location
+		googleMap.setOnMyLocationButtonClickListener(null);
+		googleMap.setOnMyLocationClickListener(null);
+		
+		googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+		googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_style));
+		
+		googleMap.getUiSettings().setTiltGesturesEnabled(true);   // Enable tilting
+		googleMap.getUiSettings().setRotateGesturesEnabled(true); // Enable rotation
+		
+		// Disable everything else
+		googleMap.getUiSettings().setScrollGesturesEnabled(false);
+		googleMap.getUiSettings().setZoomGesturesEnabled(false);
+		googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+		googleMap.getUiSettings().setCompassEnabled(false);
+		googleMap.getUiSettings().setIndoorLevelPickerEnabled(false);
+		googleMap.getUiSettings().setMapToolbarEnabled(false);
+		googleMap.getUiSettings().setScrollGesturesEnabledDuringRotateOrZoom(false);
+		googleMap.getUiSettings().setZoomControlsEnabled(false);
+		
+		//locationManager.getCurrentLocation(Objects.requireNonNull(locationManager.getBestProvider(new Criteria(), false)));
+		
+		refreshZooming(true);
+	}
+	
+	private Circle _drawnCircle;
+	private Location _lastLocation;
+	private LatLng _lastLatLng;
+	
+	/// Auto aligns the camera and the camera to match the current preferences
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+	private void refreshZooming(boolean refreshLocation){
+		if(refreshLocation){
+			LocationManager locationManager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+			
+			_lastLocation = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(new Criteria(), false))); // get last known location
+			_lastLatLng = new LatLng(_lastLocation == null ? 0 : _lastLocation.getLatitude(), _lastLocation == null ? 0 : _lastLocation.getLongitude());
+		}
+		var cameraPosition = new CameraPosition.Builder()
+				.target(_lastLatLng)
+				.zoom(getGoogleMapsZoomLevel(_lastLatLng.latitude)) // Zoom level
+				.tilt(0) // No tilt, topdown view
+				.build();
+		_googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+		
+		if(_drawnCircle == null){
+			_drawnCircle = _googleMap.addCircle(new CircleOptions()
+					.center(_lastLatLng)
+					.radius(_currentMeters)
+					.strokeColor(getApplicationContext().getColor(R.color.map_border)) // semi-transparent border color
+					.strokeWidth(4f)
+					.fillColor(getApplicationContext().getColor(R.color.map_background)) // more transparent fill color
+			);
+		}
+		else{
+			_drawnCircle.setRadius(_currentMeters);
+		}
+		
+		Log.d(TAG, "refreshZooming: Refreshed zooming, new distance is: " + _currentMeters);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		_mapView.onResume();
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		_mapView.onStart();
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		_mapView.onStop();
+	}
+	
+	@Override
+	protected void onPause() {
+		_mapView.onPause();
+		super.onPause();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		_mapView.onDestroy();
+		super.onDestroy();
+	}
+	
+	@Override
+	public void onLowMemory() {
+		super.onLowMemory();
+		_mapView.onLowMemory();
+	}
+	
+	@Override
+	protected void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		
+		Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
+		if (mapViewBundle == null) {
+			mapViewBundle = new Bundle();
+			outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
+		}
+		
+		_mapView.onSaveInstanceState(mapViewBundle);
+	}
+	
+	private int getZoomProgress(int meters){
+		var from = MainActivity.MAP_MIN_DISTANCE;
+		var to = MainActivity.MAP_MAX_DISTANCE;
+		// simple lerp
+		return from + (to - from) * (meters / to);
+	}
+	
+	private float getGoogleMapsZoomLevel(double latitude) {
+		float screenWidth = getResources().getDisplayMetrics().widthPixels;
+		float metersPerPixel = (2 * _currentMeters) / screenWidth;
+		
+		final int magicNumber = 27000; // no clue why this, the map just works with this number
+		
+		// This formula calculates the google map zooming, latitude adjusted
+		return (float) Math.log(magicNumber * Math.cos(latitude * Math.PI / 180) / metersPerPixel) / (float) Math.log(2);
+	}
+	
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+		_currentMeters = MAP_MIN_DISTANCE + i;
+		Log.d(TAG, "onProgressChanged: Progress changed to: " + i);
+		refreshZooming(false);
+	}
+	
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+	
+	}
+	
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_RECENT_MAP_DISTANCE, _currentMeters);
+		refreshZooming(true);
 	}
 }

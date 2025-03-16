@@ -1,24 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/main"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	android:orientation="vertical"
 	tools:context=".MainActivity">
 	
-	<LinearLayout
+	<FrameLayout
+		android:id="@+id/map_container"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		
+	</FrameLayout>
+	
+	<androidx.appcompat.widget.LinearLayoutCompat
+		android:id="@+id/foreground_ui_layout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_marginStart="20dp"
-		android:layout_marginTop="20dp"
-		android:layout_marginEnd="20dp"
-		android:layout_marginBottom="20dp"
-		android:orientation="vertical"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent">
-	</LinearLayout>
+		android:orientation="vertical">
+		
+		<androidx.appcompat.widget.LinearLayoutCompat
+			style="@style/AppLayoutStyle"
+			android:background="@drawable/bottom_rounded_background"
+			android:backgroundTint="?attr/colorSurface"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:paddingTop="20dp"
+			android:paddingStart="20dp"
+			android:paddingEnd="20dp"
+			android:layout_gravity="center"
+			android:gravity="center"
+			android:orientation="horizontal">
+			
+			<androidx.appcompat.widget.LinearLayoutCompat
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:gravity="center"
+				android:orientation="horizontal">
+				
+				<ImageView
+					style="@style/AppImageViewStyle"
+					android:layout_width="42dp"
+					android:layout_height="42dp"
+					android:contentDescription="@string/app_name"
+					android:src="@drawable/bootlogofilled" />
+				
+				<com.google.android.material.textview.MaterialTextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/app_name"
+					android:textColor="?attr/colorPrimary"
+					android:textSize="16sp"
+					android:textStyle="bold" />
+			
+			</androidx.appcompat.widget.LinearLayoutCompat>
+			
+			<Space
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1" />
+			
+			<androidx.appcompat.widget.AppCompatImageButton
+				android:id="@+id/chart_button"
+				style="@style/AppImageButtonStyle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/ic_chart" />
+			
+			<Space
+				android:layout_width="8dp"
+				android:layout_height="wrap_content" />
+			
+			<androidx.appcompat.widget.AppCompatImageButton
+				android:id="@+id/qrcode_button"
+				style="@style/AppImageButtonStyle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/ic_qrcode" />
+		
+		</androidx.appcompat.widget.LinearLayoutCompat>
+		
+		<Space
+			android:layout_weight="1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		
+		<androidx.appcompat.widget.LinearLayoutCompat
+			style="@style/AppLayoutStyle"
+			android:background="@drawable/rounded_background"
+			android:backgroundTint="?attr/colorSurface"
+			android:layout_marginTop="12dp"
+			android:layout_marginBottom="12dp"
+			android:paddingTop="12dp"
+			android:paddingBottom="12dp"
+			android:paddingEnd="12dp"
+			android:paddingStart="12dp"
+			android:layout_marginEnd="12dp"
+			android:layout_marginStart="12dp"
+			android:layout_gravity="end"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:gravity="center">
+			
+			<com.google.android.material.textview.MaterialTextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/main_seekbar_min_distance"
+				android:textColor="?attr/colorPrimary"
+				android:textSize="12sp"
+				android:textStyle="bold" />
+			
+			<androidx.appcompat.widget.AppCompatSeekBar
+				android:id="@+id/map_zoom_seekbar"
+				android:layout_weight="1"
+				android:layout_marginStart="4dp"
+				android:layout_marginEnd="4dp"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				style="@style/AppSeekbarStyle"
+				android:max="100"
+				android:progress="0"/>
+			
+			<com.google.android.material.textview.MaterialTextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/main_seekbar_max_distance"
+				android:textColor="?attr/colorPrimary"
+				android:textSize="12sp"
+				android:textStyle="bold" />
+		
+		</androidx.appcompat.widget.LinearLayoutCompat>
+		
+		<androidx.appcompat.widget.LinearLayoutCompat
+			style="@style/AppLayoutStyle"
+			android:background="@drawable/top_rounded_background"
+			android:backgroundTint="?attr/colorSurface"
+			android:paddingTop="20dp"
+			android:paddingBottom="20dp"
+			android:paddingStart="20dp"
+			android:paddingEnd="20dp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="end"
+			android:gravity="center"
+			android:orientation="horizontal">
+			
+			<com.google.android.material.textview.MaterialTextView
+				android:layout_weight="99"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/main_usage_helper"
+				android:textColor="?attr/colorPrimary"
+				android:textSize="16sp"
+				android:textStyle="normal" />
+			
+			<Space
+				android:layout_width="8dp"
+				android:layout_height="wrap_content"/>
+			
+			<androidx.appcompat.widget.AppCompatImageButton
+				android:layout_weight="1"
+				android:id="@+id/startnew_button"
+				style="@style/AppImageButtonBigStyle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/ic_walk" />
+		
+		</androidx.appcompat.widget.LinearLayoutCompat>
+		
+	</androidx.appcompat.widget.LinearLayoutCompat>
 	
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
