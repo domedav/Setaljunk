@@ -52,7 +52,7 @@
 					android:layout_height="wrap_content"
 					android:text="@string/app_name"
 					android:textColor="?attr/colorPrimary"
-					android:textSize="16sp"
+					android:textSize="18sp"
 					android:textStyle="bold" />
 			
 			</androidx.appcompat.widget.LinearLayoutCompat>
@@ -149,6 +149,7 @@
 			android:orientation="horizontal">
 			
 			<com.google.android.material.textview.MaterialTextView
+				android:id="@+id/helper_text_display"
 				android:layout_weight="99"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -161,13 +162,31 @@
 				android:layout_width="8dp"
 				android:layout_height="wrap_content"/>
 			
-			<androidx.appcompat.widget.AppCompatImageButton
+			<FrameLayout
 				android:layout_weight="1"
-				android:id="@+id/startnew_button"
-				style="@style/AppImageButtonBigStyle"
+				android:layout_gravity="center"
 				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/ic_walk" />
+				android:layout_height="wrap_content">
+				
+				<androidx.appcompat.widget.AppCompatImageButton
+					android:id="@+id/startnew_button"
+					android:visibility="visible"
+					style="@style/AppImageButtonBigStyle"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_walk" />
+				
+				<com.google.android.material.progressindicator.CircularProgressIndicator
+					android:id="@+id/startnew_progress"
+					android:visibility="invisible"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center"
+					android:foregroundGravity="center"
+					android:progress="10"/>
+				
+			</FrameLayout>
 		
 		</androidx.appcompat.widget.LinearLayoutCompat>
 		

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/main"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".StatsActivity"
+	android:orientation="vertical">
+	
+	<androidx.appcompat.widget.LinearLayoutCompat
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:gravity="center"
+		android:layout_marginStart="20dp"
+		android:layout_marginTop="20dp"
+		android:layout_marginEnd="20dp"
+		android:layout_marginBottom="20dp"
+		android:orientation="horizontal">
+		
+		<androidx.appcompat.widget.AppCompatImageButton
+			android:id="@+id/navigate_back_button"
+			style="@style/AppImageButtonStyle"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_back" />
+		
+		<Space
+			android:layout_width="8dp"
+			android:layout_height="wrap_content" />
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/stats_header"
+			android:textColor="?attr/colorPrimary"
+			android:textSize="24sp"
+			android:textStyle="bold" />
+		
+	</androidx.appcompat.widget.LinearLayoutCompat>
+	
+	<androidx.core.widget.NestedScrollView
+		android:layout_weight="1"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_marginStart="20dp"
+		android:layout_marginEnd="20dp"
+		android:layout_marginBottom="20dp">
+		
+		<androidx.appcompat.widget.LinearLayoutCompat
+			style="@style/AppLayoutStyle"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:gravity="center"
+			android:orientation="vertical"
+			android:paddingTop="20dp"
+			android:paddingBottom="20dp">
+			
+			<com.google.android.material.textview.MaterialTextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/stats_total_header"
+				android:textColor="?attr/colorPrimary"
+				android:layout_gravity="center"
+				android:gravity="center"
+				android:textSize="14sp"
+				android:textStyle="bold" />
+			
+			<Space
+				android:layout_width="match_parent"
+				android:layout_height="12dp"/>
+			
+			<androidx.appcompat.widget.LinearLayoutCompat
+				android:layout_width="match_parent"
+				android:layout_gravity="center"
+				android:gravity="center"
+				android:orientation="horizontal"
+				android:layout_marginEnd="20dp"
+				android:layout_marginStart="20dp"
+				android:layout_height="wrap_content">
+				
+				<ImageView
+					style="@style/AppImageViewStyle"
+					android:layout_width="48dp"
+					android:layout_height="48dp"
+					android:contentDescription="@string/stats_steps_total"
+					android:src="@drawable/ic_footsteps" />
+				
+				<Space
+					android:layout_width="12dp"
+					android:layout_height="wrap_content"/>
+				
+				<androidx.appcompat.widget.LinearLayoutCompat
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@string/stats_steps_total"
+						android:textColor="?attr/colorPrimary"
+						android:textSize="24sp"
+						android:textStyle="normal" />
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:id="@+id/total_steps_display"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@string/stats_steps_total"
+						android:textColor="?attr/colorPrimary"
+						android:textSize="16sp"
+						android:textStyle="bold" />
+				
+				</androidx.appcompat.widget.LinearLayoutCompat>
+			
+			</androidx.appcompat.widget.LinearLayoutCompat>
+			
+			<Space
+				android:layout_width="match_parent"
+				android:layout_height="28dp"/>
+			
+			<androidx.appcompat.widget.LinearLayoutCompat
+				android:layout_width="match_parent"
+				android:layout_gravity="center"
+				android:gravity="center"
+				android:orientation="horizontal"
+				android:layout_marginEnd="20dp"
+				android:layout_marginStart="20dp"
+				android:layout_height="wrap_content">
+				
+				<ImageView
+					style="@style/AppImageViewStyle"
+					android:layout_width="48dp"
+					android:layout_height="48dp"
+					android:contentDescription="@string/stats_calories_total"
+					android:src="@drawable/ic_calories" />
+				
+				<Space
+					android:layout_width="12dp"
+					android:layout_height="wrap_content"/>
+				
+				<androidx.appcompat.widget.LinearLayoutCompat
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@string/stats_calories_total"
+						android:textColor="?attr/colorPrimary"
+						android:textSize="24sp"
+						android:textStyle="normal" />
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:id="@+id/total_calories_display"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@string/stats_calories_total"
+						android:textColor="?attr/colorPrimary"
+						android:textSize="16sp"
+						android:textStyle="bold" />
+				
+				</androidx.appcompat.widget.LinearLayoutCompat>
+			
+			</androidx.appcompat.widget.LinearLayoutCompat>
+			
+			<Space
+				android:layout_width="match_parent"
+				android:layout_height="28dp"/>
+			
+			<androidx.appcompat.widget.LinearLayoutCompat
+				android:layout_width="match_parent"
+				android:layout_gravity="center"
+				android:gravity="center"
+				android:orientation="horizontal"
+				android:layout_marginEnd="20dp"
+				android:layout_marginStart="20dp"
+				android:layout_height="wrap_content">
+				
+				<ImageView
+					style="@style/AppImageViewStyle"
+					android:layout_width="48dp"
+					android:layout_height="48dp"
+					android:contentDescription="@string/stats_distance_total"
+					android:src="@drawable/ic_distance" />
+				
+				<Space
+					android:layout_width="12dp"
+					android:layout_height="wrap_content"/>
+				
+				<androidx.appcompat.widget.LinearLayoutCompat
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@string/stats_distance_total"
+						android:textColor="?attr/colorPrimary"
+						android:textSize="24sp"
+						android:textStyle="normal" />
+					
+					<com.google.android.material.textview.MaterialTextView
+						android:id="@+id/total_distance_display"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="@string/stats_distance_total"
+						android:textColor="?attr/colorPrimary"
+						android:textSize="16sp"
+						android:textStyle="bold" />
+				
+				</androidx.appcompat.widget.LinearLayoutCompat>
+			
+			</androidx.appcompat.widget.LinearLayoutCompat>
+			
+			<Space
+				android:layout_width="match_parent"
+				android:layout_height="32dp"/>
+			
+			<com.google.android.material.button.MaterialButton
+				android:id="@+id/detailed_charts_button"
+				style="@style/AppButtonStyle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:layout_marginBottom="20dp"
+				android:paddingStart="72dp"
+				android:paddingEnd="72dp"
+				android:text="@string/stats_view_daily_button" />
+		
+		</androidx.appcompat.widget.LinearLayoutCompat>
+	
+	</androidx.core.widget.NestedScrollView>
+	
+</androidx.appcompat.widget.LinearLayoutCompat>
