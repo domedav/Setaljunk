@@ -21,11 +21,27 @@
 	<string name="main_usage_generation_in_progress">Várj egy pillanatot!\nHamarosan már úton is lehetsz.</string>
 	<string name="main_seekbar_min_distance">100m</string>
 	<string name="main_seekbar_max_distance">5000m</string>
+	<string name="main_popup_no_sensory_header">Hiányzó Funkciók</string>
+	<string name="main_popup_no_sensory_description">Kérlek kapcsold be az internet elérést, és a GPS funkciót, hogy tudd használni az alkalmazást!</string>
+	<string name="main_popup_no_sensory_action_ok">Ok</string>
 	
-	<string name="stats_header">Statisztikák</string>
+	<string name="stats_header">Statisztika</string>
 	<string name="stats_steps_total">Lépések:</string>
+	<string name="stats_steps_total_string">%1$sdb</string>
 	<string name="stats_calories_total">Elégetett kalóriák:</string>
+	<string name="stats_calories_total_string">%1$skcal</string>
 	<string name="stats_distance_total">Megjárt méterek:</string>
+	<string name="stats_distance_total_string">%1$skm</string>
 	<string name="stats_total_header">Összesített adataid:</string>
 	<string name="stats_view_daily_button">Alkalmi bontás</string>
+	
+	<string name="qr_header">Megosztás</string>
+	<string name="qr_scanpage_otherqr_header">Szkenneld be a QR kódot a barátod telefonjáról!</string>
+	<string name="qr_scanpage_otherqr_help">Amennyiben te szeretnél megosztani QR kódot, indítsd el a navigációt.</string>
+	<string name="qr_scanpage_myqr_header">Mutasd meg a barátodnak ezt a QR kódot!</string>
+	<string name="qr_scanpage_myqr_help">Amennyiben te szeretnél beolvasni QR kódot, állítsd le a navigációt.</string>
+	<string name="qr_popup_no_camera_header">Kamera Engedély</string>
+	<string name="qr_popup_no_camera_description">Kérlek adj hozzáférést az alkalmazásnak a kamerához, hogy be tudd olvasni a QR-kódot</string>
+	<string name="qr_popup_no_camera_no">Vissza</string>
+	<string name="qr_popup_no_camera_yes">Engedélyezés</string>
 </resources>

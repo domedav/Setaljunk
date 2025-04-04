@@ -63,6 +63,7 @@
 				android:layout_weight="1" />
 			
 			<androidx.appcompat.widget.AppCompatImageButton
+				android:hapticFeedbackEnabled="true"
 				android:id="@+id/chart_button"
 				style="@style/AppImageButtonStyle"
 				android:layout_width="wrap_content"
@@ -74,6 +75,7 @@
 				android:layout_height="wrap_content" />
 			
 			<androidx.appcompat.widget.AppCompatImageButton
+				android:hapticFeedbackEnabled="true"
 				android:id="@+id/qrcode_button"
 				style="@style/AppImageButtonStyle"
 				android:layout_width="wrap_content"
@@ -88,6 +90,7 @@
 			android:layout_height="wrap_content"/>
 		
 		<androidx.appcompat.widget.LinearLayoutCompat
+			android:id="@+id/zoom_seekbar_layout"
 			style="@style/AppLayoutStyle"
 			android:background="@drawable/rounded_background"
 			android:backgroundTint="?attr/colorSurface"
@@ -135,6 +138,7 @@
 		</androidx.appcompat.widget.LinearLayoutCompat>
 		
 		<androidx.appcompat.widget.LinearLayoutCompat
+			android:id="@+id/bottom_layout"
 			style="@style/AppLayoutStyle"
 			android:background="@drawable/top_rounded_background"
 			android:backgroundTint="?attr/colorSurface"
@@ -178,6 +182,7 @@
 					android:src="@drawable/ic_walk" />
 				
 				<com.google.android.material.progressindicator.CircularProgressIndicator
+					android:hapticFeedbackEnabled="true"
 					android:id="@+id/startnew_progress"
 					android:visibility="invisible"
 					android:layout_width="wrap_content"

@@ -5,8 +5,11 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
+import android.location.GnssStatus;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,11 +25,11 @@ import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-
 import com.domedav.setaljunk.location.LocationGeneration;
 import com.domedav.setaljunk.permissions.AppPermissions;
 import com.domedav.setaljunk.sharedpreferences.AppDataStore;
@@ -64,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	private AppCompatImageButton _qrButton;
 	private AppCompatImageButton _walkStartButton;
 	
+	private LinearLayoutCompat _zoomSeekbarLayout;
+	private LinearLayoutCompat _bottomLayout;
+	
 	private CircularProgressIndicator _progressbar;
 	private MaterialTextView _helperTextView;
 	
@@ -71,11 +77,82 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	private Location _lastLocation;
 	private LatLng _lastLatLng;
 	
+	private GnssStatus.Callback _gpsCallback;
+	private ConnectivityManager.NetworkCallback _networkCallback;
+	
+	private boolean hasGps = true;
+	private boolean hasInternet = true;
+	
+	@RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
 	@Override
 	protected void onResume() {
 		super.onResume();
+		if(!AppPermissions.hasPermission(this, AppPermissions.LOCATION) || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !AppPermissions.hasPermission(this, AppPermissions.ACTIVITY_SENSOR))){
+			// missing permissions, user must have disabled them while app was inactive
+			launchSetupScreen();
+			return;
+		}
+		
 		if(_mapView != null)
 			_mapView.onResume();
+		
+		// Register connectivity
+		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		_networkCallback = new ConnectivityManager.NetworkCallback(){
+			@Override
+			public void onAvailable(@NonNull Network network) {
+				super.onAvailable(network);
+				// Has internet
+				hasInternet = connectivityManager.isDefaultNetworkActive();
+			}
+			
+			@Override
+			public void onLost(@NonNull Network network) {
+				super.onLost(network);
+				// Has no internet
+				hasInternet = connectivityManager.isDefaultNetworkActive();
+				displayPopupNoInternetOrGPS();
+			}
+		};
+		connectivityManager.registerDefaultNetworkCallback(_networkCallback);
+		
+		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE); // We have location permission, as it is checked before
+		_gpsCallback = new GnssStatus.Callback() {
+			@Override
+			public void onStarted() {
+				super.onStarted();
+				// Has GPS
+				hasGps = locationManager.isLocationEnabled();
+			}
+			
+			@Override
+			public void onStopped() {
+				super.onStopped();
+				// Has no GPS
+				hasGps = locationManager.isLocationEnabled();
+				displayPopupNoInternetOrGPS();
+			}
+		};
+		locationManager.registerGnssStatusCallback(_gpsCallback);
+		
+		displayPopupNoInternetOrGPS(); // check if we still have all permissions enabled
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if(_mapView != null)
+			_mapView.onPause();
+		
+		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(_networkCallback != null){
+			connectivityManager.unregisterNetworkCallback(_networkCallback);
+		}
+		
+		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		if(locationManager != null && _gpsCallback != null){
+			locationManager.unregisterGnssStatusCallback(_gpsCallback);
+		}
 	}
 	
 	@Override
@@ -93,17 +170,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	}
 	
 	@Override
-	protected void onPause() {
-		if(_mapView != null)
-			_mapView.onPause();
-		super.onPause();
-	}
-	
-	@Override
 	protected void onDestroy() {
+		super.onDestroy();
 		if(_mapView != null)
 			_mapView.onDestroy();
-		super.onDestroy();
 	}
 	
 	@Override
@@ -131,13 +201,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		Log.i(TAG, "onCreate: hasSetup: " + hasSetup);
 		
 		if(!hasSetup || (!AppPermissions.hasPermission(this, AppPermissions.LOCATION) || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !AppPermissions.hasPermission(this, AppPermissions.ACTIVITY_SENSOR)))){ // User needs to grant us the permissions to be able to use the app
-			AppDataStore.setData(AppDataStore.SetupPrefsKeys.STOREKEY, AppDataStore.SetupPrefsKeys.DATAKEY_HAS_SETUP, false);
-			Intent intent = new Intent(this, SetupActivity.class);
-			startActivity(intent); // launch the setup activity, and close this activity
-			finish();
+			launchSetupScreen();
 			return;
 		}
 		
+		if(!displayPopupNoInternetOrGPS()){
+			return;
+		}
+		
+		setupActivity();
+	}
+	
+	private void launchSetupScreen(){
+		AppDataStore.setData(AppDataStore.SetupPrefsKeys.STOREKEY, AppDataStore.SetupPrefsKeys.DATAKEY_HAS_SETUP, false);
+		
+		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, false);
+		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_NAVIGATION_DESTINATION_LATLNG, "NULL");
+		
+		Intent intent = new Intent(this, SetupActivity.class);
+		startActivity(intent); // launch the setup activity, and close this activity
+		finish();
+	}
+	
+	/// This should only be run, if the user has all permissions, and sensors activated
+	
+	private void setupActivity(){
+		if(_mapView != null){
+			return; // has setup
+		}
 		// Use recently used value
 		_currentMeters = AppDataStore.getData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_RECENT_MAP_DISTANCE, 500); // default walk distance is 500m
 		
@@ -154,12 +245,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		
 		_mapSeekbar.setOnSeekBarChangeListener(this);
 		
-		
 		// Initialize the MapView
-		Bundle mapViewBundle = null;
-		if (savedInstanceState != null) {
-			mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
-		}
+		Bundle mapViewBundle = new Bundle();
 		
 		_mapView.onCreate(mapViewBundle);
 		_mapView.getMapAsync(this);
@@ -167,6 +254,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		_walkStartButton = findViewById(R.id.startnew_button);
 		_statsButton = findViewById(R.id.chart_button);
 		_qrButton = findViewById(R.id.qrcode_button);
+		
+		_zoomSeekbarLayout = findViewById(R.id.zoom_seekbar_layout);
+		_bottomLayout = findViewById(R.id.bottom_layout);
 		
 		_progressbar = findViewById(R.id.startnew_progress);
 		_helperTextView = findViewById(R.id.helper_text_display);
@@ -186,6 +276,47 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		});
 	}
 	
+	private boolean displayPopupNoInternetOrGPS(){
+		LocationManager locationManager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+		if(locationManager == null){
+			return false;
+		}
+		var gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		var internet_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		
+		if(!gps_enabled || !hasGps || !internet_enabled || !hasInternet){
+			Toast.makeText(getApplicationContext(), getString(R.string.main_gps_missing_services), Toast.LENGTH_LONG).show(); // alert user, that no gps or internet is available
+			showPopupMenuOk(getString(R.string.main_popup_no_sensory_header), getString(R.string.main_popup_no_sensory_description), getString(R.string.main_popup_no_sensory_action_ok));
+			return false;
+		}
+		return true;
+	}
+	
+	private void showPopupMenuOk(String header, String description, String actionOk){
+		View view = findViewById(R.id.foreground_ui_layout);
+		view.post(()->{ // post dialog on the UI thread, ensuring the UI in initialized, and the user can see it
+			AppPopupMenu.showPopupMenuOk(this, header, description, actionOk, new AppPopupMenu.Callback() {
+				@Override
+				public void onActionNo() {
+				
+				}
+				
+				@Override
+				public void onActionYes() {
+				
+				}
+				
+				@Override
+				public void onActionOk() {
+					AppPopupMenu.dismissPopupMenu();
+					if(displayPopupNoInternetOrGPS()){ // has all perms, enable the app
+						setupActivity();
+					}
+				}
+			});
+		});
+	}
+	
 	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
 	@Override
 	public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -198,14 +329,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		if(locationManager == null){
 			return;
 		}
-		var gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-		var internet_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 		
-		if(!gps_enabled || !internet_enabled){
-			Toast.makeText(getApplicationContext(), getString(R.string.main_gps_missing_services), Toast.LENGTH_LONG).show(); // alert user, that no gps or internet is available
-			//TODO: make this a dialog
-			return;
-		}
 		MapsInitializer.initialize(this);
 		
 		googleMap.setMyLocationEnabled(true); // show current location
@@ -215,8 +339,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 		googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_style));
 		
-		googleMap.getUiSettings().setTiltGesturesEnabled(true);   // Enable tilting
-		googleMap.getUiSettings().setRotateGesturesEnabled(true); // Enable rotation
+		googleMap.getUiSettings().setTiltGesturesEnabled(true);  // Enable tilting
 		
 		// Disable everything else
 		googleMap.getUiSettings().setScrollGesturesEnabled(false);
@@ -227,6 +350,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		googleMap.getUiSettings().setMapToolbarEnabled(false);
 		googleMap.getUiSettings().setScrollGesturesEnabledDuringRotateOrZoom(false);
 		googleMap.getUiSettings().setZoomControlsEnabled(false);
+		googleMap.getUiSettings().setRotateGesturesEnabled(false);
 		
 		//locationManager.getCurrentLocation(Objects.requireNonNull(locationManager.getBestProvider(new Criteria(), false)));
 		
@@ -273,16 +397,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	@Override
 	protected void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
-		
-		if(_mapView != null){
-			Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
-			if (mapViewBundle == null) {
-				mapViewBundle = new Bundle();
-				outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
-			}
-			
-			_mapView.onSaveInstanceState(mapViewBundle);
-		}
 	}
 	
 	private float getGoogleMapsZoomLevel(double latitude) {
@@ -320,10 +434,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 			return;
 		}
 		_walkStartButton.setVisibility(View.INVISIBLE);
+		_zoomSeekbarLayout.setVisibility(View.INVISIBLE);
 		
 		_helperTextView.setText(getString(R.string.main_usage_generation_in_progress));
 		
-		var animTime = 3500;
+		var animTime = 2000;
 		_progressbar.setVisibility(View.VISIBLE);
 		_progressbar.setProgress(0, false);
 		_progressbar.setMax(100);
@@ -336,6 +451,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		
 		new Handler(Looper.getMainLooper()).postDelayed(() -> {
 			OnGeneratedLocation(latlng);
+			_bottomLayout.setVisibility(View.INVISIBLE);
 		}, animTime); // call after time passed
 	}
 	

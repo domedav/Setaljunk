@@ -168,6 +168,7 @@
 							android:layout_height="8dp" />
 						
 						<com.google.android.material.button.MaterialButton
+							android:hapticFeedbackEnabled="true"
 							android:id="@+id/gps_button"
 							style="@style/AppButtonStyle"
 							android:layout_width="wrap_content"
@@ -240,6 +241,7 @@
 							android:layout_height="8dp" />
 						
 						<com.google.android.material.button.MaterialButton
+							android:hapticFeedbackEnabled="true"
 							android:id="@+id/camera_button"
 							style="@style/AppButtonStyle"
 							android:layout_width="wrap_content"
@@ -303,6 +305,7 @@
 							android:layout_height="8dp" />
 						
 						<com.google.android.material.button.MaterialButton
+							android:hapticFeedbackEnabled="true"
 							android:id="@+id/steps_button"
 							style="@style/AppButtonStyle"
 							android:layout_width="wrap_content"
@@ -320,6 +323,7 @@
 	</androidx.core.widget.NestedScrollView>
 	
 	<com.google.android.material.button.MaterialButton
+		android:hapticFeedbackEnabled="true"
 		android:layout_weight="1"
 		android:id="@+id/next_button"
 		style="@style/AppButtonStyle"

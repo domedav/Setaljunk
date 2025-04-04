@@ -5,4 +5,5 @@
 	
 	<color name="map_border">#154644</color>
 	<color name="map_background">#6418514E</color>
+	<color name="transparent">#00FFFFFF</color>
 </resources>

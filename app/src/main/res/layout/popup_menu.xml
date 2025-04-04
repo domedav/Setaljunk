@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/popup_root"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:layout_gravity="center"
+	android:gravity="center"
+	android:orientation="vertical">
+	
+	<androidx.appcompat.widget.LinearLayoutCompat
+		android:layout_width="match_parent"
+		android:paddingEnd="20dp"
+		android:paddingTop="20dp"
+		android:paddingStart="20dp"
+		android:paddingBottom="20dp"
+		android:layout_marginEnd="20dp"
+		android:layout_marginStart="20dp"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		style="@style/AppLayoutStyle">
+		
+		<androidx.appcompat.widget.LinearLayoutCompat
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+			
+			<ImageView
+				style="@style/AppImageViewStyle"
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:layout_gravity="center"
+				android:contentDescription="not set"
+				android:src="@drawable/ic_info" />
+			
+			<com.google.android.material.textview.MaterialTextView
+				android:layout_weight="1"
+				android:id="@+id/popup_header"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center"
+				android:layout_gravity="center"
+				android:text="Header"
+				android:textColor="?attr/colorPrimary"
+				android:textSize="28sp"
+				android:textStyle="bold" />
+			
+		</androidx.appcompat.widget.LinearLayoutCompat>
+		
+		<Space
+			android:layout_width="wrap_content"
+			android:layout_height="12dp"/>
+		
+		<com.google.android.material.textview.MaterialTextView
+			android:id="@+id/popup_description"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="start"
+			android:layout_gravity="center"
+			android:text="Description"
+			android:textColor="?attr/colorPrimary"
+			android:textSize="14sp"
+			android:textStyle="bold" />
+		
+		<Space
+			android:layout_width="wrap_content"
+			android:layout_height="32dp"/>
+		
+		<androidx.appcompat.widget.LinearLayoutCompat
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+			
+			<com.google.android.material.button.MaterialButton
+				android:layout_weight="1"
+				android:id="@+id/popup_action_no"
+				style="@style/AppButtonStyle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:text="Action No" />
+			
+			<Space
+				android:id="@+id/popup_yesno_space"
+				android:layout_width="12dp"
+				android:layout_height="wrap_content"/>
+			
+			<com.google.android.material.button.MaterialButton
+				android:layout_weight="4"
+				android:id="@+id/popup_action_yes"
+				style="@style/AppButtonStyle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:text="Action Yes" />
+			
+			<com.google.android.material.button.MaterialButton
+				android:layout_weight="1"
+				android:id="@+id/popup_action_ok"
+				style="@style/AppButtonStyle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:text="Action Ok" />
+			
+		</androidx.appcompat.widget.LinearLayoutCompat>
+		
+	</androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 	<!-- Base application theme. -->
 	<style name="Theme.Sétáljunk" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
-
+	
 	</style>
 	
 	<style name="AppButtonStyle" parent="Widget.Material3.Button">
@@ -15,6 +15,7 @@
 		<item name="android:paddingBottom">12dp</item>
 		<item name="android:textSize">18sp</item>
 		<item name="android:textStyle">bold</item>
+		<item name="android:hapticFeedbackEnabled">true</item>
 	</style>
 	
 	<style name="AppLayoutStyle">
@@ -26,6 +27,7 @@
 		<item name="android:paddingBottom">12dp</item>
 		<item name="android:gravity">center_vertical|fill_horizontal</item>
 		<item name="android:layout_gravity">center_vertical|fill_horizontal</item>
+		<item name="android:hapticFeedbackEnabled">true</item>
 	</style>
 	
 	<style name="AppImageViewStyle">
@@ -36,6 +38,7 @@
 		<item name="android:paddingBottom">8dp</item>
 		<item name="android:gravity">center_vertical|fill_horizontal</item>
 		<item name="android:layout_gravity">center_vertical|fill_horizontal</item>
+		<item name="android:hapticFeedbackEnabled">true</item>
 	</style>
 	
 	<style name="AppImageButtonStyle" parent="Widget.AppCompat.ImageButton">
@@ -47,6 +50,7 @@
 		<item name="android:paddingEnd">12dp</item>
 		<item name="android:paddingTop">12dp</item>
 		<item name="android:paddingBottom">12dp</item>
+		<item name="android:hapticFeedbackEnabled">true</item>
 	</style>
 	
 	<style name="AppImageButtonBigStyle" parent="AppImageButtonStyle">
@@ -54,6 +58,7 @@
 		<item name="android:paddingEnd">20dp</item>
 		<item name="android:paddingTop">20dp</item>
 		<item name="android:paddingBottom">20dp</item>
+		<item name="android:hapticFeedbackEnabled">true</item>
 	</style>
 	
 	<style name="AppSeekbarStyle" parent="Widget.AppCompat.SeekBar">
@@ -63,6 +68,13 @@
 		<item name="android:progressBackgroundTint">?attr/colorSurfaceVariant</item>
 		<item name="android:thumb">@drawable/ic_thumb</item>
 		<item name="android:splitTrack">false</item>
+		<item name="android:hapticFeedbackEnabled">true</item>
 	</style>
 	
+	
+	<style name="AppRoundedCorners">
+		<item name="cornerFamily">rounded</item>
+		<item name="cornerSize">16dp</item>
+	</style>
+
 </resources>
