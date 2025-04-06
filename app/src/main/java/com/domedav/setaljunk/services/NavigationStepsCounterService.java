@@ -22,7 +22,6 @@ import com.domedav.setaljunk.sharedpreferences.AppDataStore;
 public class NavigationStepsCounterService extends Service implements SensorEventListener {
 	private static final String TAG = "NavigationStepsCounterService";
 	private static final int STEP_SERVICE_ID = 101;
-	private static final int NOTIFICATION_ID = 1001;
 	private static final String CHANNEL_ID = "step_counter_channel";
 	
 	private SensorManager _sensorManager;

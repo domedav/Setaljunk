@@ -12,11 +12,11 @@ public class AppPermissions {
 	public static String LOCATION = Manifest.permission.ACCESS_FINE_LOCATION; // we need to know exactly where the user is
 	public static String CAMERA = Manifest.permission.CAMERA;
 	
+	@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+	public static String NOTIFICATIONS = Manifest.permission.POST_NOTIFICATIONS;
+	
 	@RequiresApi(api = Build.VERSION_CODES.Q)
 	public static String ACTIVITY_SENSOR = Manifest.permission.ACTIVITY_RECOGNITION;
-	
-	@RequiresApi(api = Build.VERSION_CODES.S)
-	public static String ALARMS = Manifest.permission.SCHEDULE_EXACT_ALARM;
 	
 	public static boolean hasPermission(@NonNull Activity activity, String permission){
 		return ContextCompat.checkSelfPermission(activity.getApplicationContext(), permission) == PackageManager.PERMISSION_GRANTED;

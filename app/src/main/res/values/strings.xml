@@ -12,7 +12,9 @@
 	<string name="setup_perm_gps_description">Erre az engedélyre azért van szükség, hiszen az applikáció nem tudná nyomonkövetni, hogy merre jársz.</string>
 	<string name="setup_perm_camera">Kamera</string>
 	<string name="setup_perm_camera_description">Erre az engedélyre azért van szükség, hogy be tudd scannelni a barátaid által megosztott QR-kódot.</string>
-	<string name="setup_perm_camera_description_optional">(Nem kötelező)</string>
+	<string name="setup_perm_optional">(Nem kötelező)</string>
+	<string name="setup_perm_notification">Értesítések</string>
+	<string name="setup_perm_notification_description">Erre az engedélyre azért van szükség, hogy az app tudjon neked minden nap szólni, hogy mozogj.</string>
 	<string name="setup_perm_steps">Lépésszámláló</string>
 	<string name="setup_perm_steps_description">Erre az engedélyre azért van szükség, hogy az app tudja, mennyi lépést tettél meg.</string>
 	

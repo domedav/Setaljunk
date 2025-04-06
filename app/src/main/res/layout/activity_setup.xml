@@ -182,79 +182,6 @@
 						android:layout_height="16dp" />
 					
 					<androidx.appcompat.widget.LinearLayoutCompat
-						android:id="@+id/camera_view"
-						style="@style/AppLayoutStyle"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center"
-						android:gravity="center"
-						android:orientation="vertical">
-						
-						<androidx.appcompat.widget.LinearLayoutCompat
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_gravity="center"
-							android:gravity="center"
-							android:orientation="horizontal">
-							
-							<ImageView
-								style="@style/AppImageViewStyle"
-								android:layout_width="48dp"
-								android:layout_height="48dp"
-								android:contentDescription="@string/setup_perm_camera"
-								android:src="@drawable/ic_camera" />
-							
-							<androidx.appcompat.widget.AppCompatTextView
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:text="@string/setup_perm_camera"
-								android:textAlignment="center"
-								android:textColor="?attr/colorPrimary"
-								android:textSize="24sp"
-								android:textStyle="bold" />
-						
-						</androidx.appcompat.widget.LinearLayoutCompat>
-						
-						<androidx.appcompat.widget.AppCompatTextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:text="@string/setup_perm_camera_description_optional"
-							android:textAlignment="center"
-							android:textColor="?attr/colorPrimary"
-							android:textSize="12sp"
-							android:textStyle="normal" />
-						
-						<Space
-							android:layout_width="wrap_content"
-							android:layout_height="8dp" />
-						
-						<androidx.appcompat.widget.AppCompatTextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:text="@string/setup_perm_camera_description"
-							android:textColor="?attr/colorPrimary"
-							android:textSize="16sp"
-							android:textStyle="normal" />
-						
-						<Space
-							android:layout_width="wrap_content"
-							android:layout_height="8dp" />
-						
-						<com.google.android.material.button.MaterialButton
-							android:hapticFeedbackEnabled="true"
-							android:id="@+id/camera_button"
-							style="@style/AppButtonStyle"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:text="@string/setup_give_perms" />
-					
-					</androidx.appcompat.widget.LinearLayoutCompat>
-					
-					<Space
-						android:layout_width="match_parent"
-						android:layout_height="16dp" />
-					
-					<androidx.appcompat.widget.LinearLayoutCompat
 						android:id="@+id/steps_view"
 						style="@style/AppLayoutStyle"
 						android:layout_width="match_parent"
@@ -307,6 +234,152 @@
 						<com.google.android.material.button.MaterialButton
 							android:hapticFeedbackEnabled="true"
 							android:id="@+id/steps_button"
+							style="@style/AppButtonStyle"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="@string/setup_give_perms" />
+					
+					</androidx.appcompat.widget.LinearLayoutCompat>
+					
+					<Space
+						android:layout_width="match_parent"
+						android:layout_height="16dp" />
+					
+					<androidx.appcompat.widget.LinearLayoutCompat
+						android:id="@+id/camera_view"
+						style="@style/AppLayoutStyle"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:gravity="center"
+						android:orientation="vertical">
+						
+						<androidx.appcompat.widget.LinearLayoutCompat
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center"
+							android:gravity="center"
+							android:orientation="horizontal">
+							
+							<ImageView
+								style="@style/AppImageViewStyle"
+								android:layout_width="48dp"
+								android:layout_height="48dp"
+								android:contentDescription="@string/setup_perm_camera"
+								android:src="@drawable/ic_camera" />
+							
+							<androidx.appcompat.widget.AppCompatTextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="@string/setup_perm_camera"
+								android:textAlignment="center"
+								android:textColor="?attr/colorPrimary"
+								android:textSize="24sp"
+								android:textStyle="bold" />
+						
+						</androidx.appcompat.widget.LinearLayoutCompat>
+						
+						<androidx.appcompat.widget.AppCompatTextView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="@string/setup_perm_optional"
+							android:textAlignment="center"
+							android:textColor="?attr/colorPrimary"
+							android:textSize="12sp"
+							android:textStyle="normal" />
+						
+						<Space
+							android:layout_width="wrap_content"
+							android:layout_height="8dp" />
+						
+						<androidx.appcompat.widget.AppCompatTextView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="@string/setup_perm_camera_description"
+							android:textColor="?attr/colorPrimary"
+							android:textSize="16sp"
+							android:textStyle="normal" />
+						
+						<Space
+							android:layout_width="wrap_content"
+							android:layout_height="8dp" />
+						
+						<com.google.android.material.button.MaterialButton
+							android:hapticFeedbackEnabled="true"
+							android:id="@+id/camera_button"
+							style="@style/AppButtonStyle"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="@string/setup_give_perms" />
+					
+					</androidx.appcompat.widget.LinearLayoutCompat>
+					
+					<Space
+						android:layout_width="match_parent"
+						android:layout_height="16dp" />
+					
+					<androidx.appcompat.widget.LinearLayoutCompat
+						android:id="@+id/notification_view"
+						style="@style/AppLayoutStyle"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:gravity="center"
+						android:orientation="vertical">
+						
+						<androidx.appcompat.widget.LinearLayoutCompat
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center"
+							android:gravity="center"
+							android:orientation="horizontal">
+							
+							<ImageView
+								style="@style/AppImageViewStyle"
+								android:layout_width="48dp"
+								android:layout_height="48dp"
+								android:contentDescription="@string/setup_perm_notification"
+								android:src="@drawable/ic_notifications" />
+							
+							<androidx.appcompat.widget.AppCompatTextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="@string/setup_perm_notification"
+								android:textAlignment="center"
+								android:textColor="?attr/colorPrimary"
+								android:textSize="24sp"
+								android:textStyle="bold" />
+						
+						</androidx.appcompat.widget.LinearLayoutCompat>
+						
+						<androidx.appcompat.widget.AppCompatTextView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="@string/setup_perm_optional"
+							android:textAlignment="center"
+							android:textColor="?attr/colorPrimary"
+							android:textSize="12sp"
+							android:textStyle="normal" />
+						
+						<Space
+							android:layout_width="wrap_content"
+							android:layout_height="8dp" />
+						
+						<androidx.appcompat.widget.AppCompatTextView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="@string/setup_perm_notification_description"
+							android:textColor="?attr/colorPrimary"
+							android:textSize="16sp"
+							android:textStyle="normal" />
+						
+						<Space
+							android:layout_width="wrap_content"
+							android:layout_height="8dp" />
+						
+						<com.google.android.material.button.MaterialButton
+							android:hapticFeedbackEnabled="true"
+							android:id="@+id/notification_button"
 							style="@style/AppButtonStyle"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"

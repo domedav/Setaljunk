@@ -232,7 +232,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 			_mapView.onLowMemory();
 	}
 	
-	@SuppressLint("ScheduleExactAlarm")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -244,8 +243,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 			return insets;
 		});
 		
-		if((Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && AppPermissions.hasPermission(this, AppPermissions.ALARMS)))
-			NotificationWorkerScheduler.scheduleDailyWork(getApplicationContext());
+		NotificationWorkerScheduler.scheduleDailyWork(getApplicationContext());
 		
 		// Initialize app data store
 		AppDataStore.initialize(getApplicationContext());
@@ -612,6 +610,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	}
 	
 	private void disableStepCounterService(){
+		if(_stepService == null || _stepServiceConnection == null){
+			return;
+		}
 		stopService(_stepServiceIntent);
 		unbindService(_stepServiceConnection);
 	}

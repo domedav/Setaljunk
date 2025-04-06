@@ -218,21 +218,6 @@
 				</androidx.appcompat.widget.LinearLayoutCompat>
 			
 			</androidx.appcompat.widget.LinearLayoutCompat>
-			
-			<Space
-				android:layout_width="match_parent"
-				android:layout_height="32dp"/>
-			
-			<!--com.google.android.material.button.MaterialButton
-				android:id="@+id/detailed_charts_button"
-				style="@style/AppButtonStyle"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center"
-				android:layout_marginBottom="20dp"
-				android:paddingStart="72dp"
-				android:paddingEnd="72dp"
-				android:text="@string/stats_view_daily_button" />-->
 		
 		</androidx.appcompat.widget.LinearLayoutCompat>
 	

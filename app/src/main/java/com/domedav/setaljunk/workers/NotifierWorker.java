@@ -5,18 +5,20 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import com.domedav.setaljunk.R;
 
-public class NotificationHelper {
+public class NotifierWorker extends Worker {
 	private static final String CHANNEL_ID = "daily_notification_channel";
 	private static final String TAG = "NavigationStepsCounterService";
-	private static final int NOTIFICATION_ID = 1002;
+	private static final int NOTIFICATION_ID = 1001;
 	
-	public NotificationHelper(Context context) {
-		createNotificationChannel(context);
+	public NotifierWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+		super(context, workerParams);
 	}
 	
 	private void createNotificationChannel(Context context) {
@@ -34,7 +36,10 @@ public class NotificationHelper {
 		Log.i(TAG, "createNotificationChannel: notification channel created");
 	}
 	
-	public void showNotification(Context context) {
+	public void showNotification(@NonNull Context context) {
+		Log.i(TAG, "showNotification: showing notification");
+		NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+		
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
 				.setContentTitle(context.getString(R.string.daily_notification_text))
 				.setContentText(context.getString(R.string.daily_notification_textsub))
@@ -42,6 +47,14 @@ public class NotificationHelper {
 				.setPriority(NotificationCompat.PRIORITY_HIGH)
 				.setAutoCancel(true);
 		
-		NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build());
+		notificationManager.notify(NOTIFICATION_ID, builder.build());
+	}
+	
+	@NonNull
+	@Override
+	public Result doWork() {
+		createNotificationChannel(getApplicationContext());
+		showNotification(getApplicationContext());
+		return Result.success();
 	}
 }
