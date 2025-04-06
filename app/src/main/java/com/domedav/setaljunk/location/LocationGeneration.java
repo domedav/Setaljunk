@@ -40,7 +40,7 @@ public class LocationGeneration {
 		address.setLongitude(newLng); // if the address is somehow incorrect, even with geocoder, just use the likely not navigatable generated location
 		try{
 			var addresses = geocoder.getFromLocation(newLat, newLng, 1);
-			if(addresses != null){
+			if(addresses != null && !addresses.isEmpty()){
 				Log.i(TAG, "generateRandomNearbyLoction: Random Location Name: " + addresses.get(0).toString());
 				address = addresses.get(0);
 			}

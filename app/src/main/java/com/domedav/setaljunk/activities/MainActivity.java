@@ -1,9 +1,12 @@
-package com.domedav.setaljunk;
+package com.domedav.setaljunk.activities;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Criteria;
 import android.location.GnssStatus;
 import android.location.Location;
@@ -13,13 +16,19 @@ import android.net.Network;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,10 +38,15 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
+
+import com.domedav.setaljunk.R;
 import com.domedav.setaljunk.location.LocationGeneration;
 import com.domedav.setaljunk.permissions.AppPermissions;
+import com.domedav.setaljunk.popupmenus.AppPopupMenu;
+import com.domedav.setaljunk.services.NavigationStepsCounterService;
 import com.domedav.setaljunk.sharedpreferences.AppDataStore;
+import com.domedav.setaljunk.workers.NotificationWorkerScheduler;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -66,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	private AppCompatImageButton _statsButton;
 	private AppCompatImageButton _qrButton;
 	private AppCompatImageButton _walkStartButton;
+	private AppCompatImageButton _stopNavigationButton;
 	
 	private LinearLayoutCompat _zoomSeekbarLayout;
 	private LinearLayoutCompat _bottomLayout;
@@ -83,7 +98,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	private boolean hasGps = true;
 	private boolean hasInternet = true;
 	
-	@RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+	private ActivityResultLauncher<Intent> _qrActivityLauncher;
+	
+	private boolean _onResumeFlip = false;
+	
+	private NavigationStepsCounterService _stepService;
+	private Intent _stepServiceIntent;
+	private final ServiceConnection _stepServiceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			NavigationStepsCounterService.NavigationStepsBinder binder =
+					(NavigationStepsCounterService.NavigationStepsBinder) service;
+			_stepService = binder.getService();
+			
+		}
+		
+		@Override
+		public void onServiceDisconnected(ComponentName arg0) {
+		
+		}
+	};
+	
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -136,6 +172,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		locationManager.registerGnssStatusCallback(_gpsCallback);
 		
 		displayPopupNoInternetOrGPS(); // check if we still have all permissions enabled
+		
+		if(AppPermissions.hasPermission(this, AppPermissions.LOCATION) && AppDataStore.getData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, false) && !_onResumeFlip){
+			var loc = AppDataStore.getData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_NAVIGATION_DESTINATION_LATLNG, "0.0;0.0");
+			_onResumeFlip = true; // can only run this once per activity
+			_walkStartButton.postDelayed(() -> {
+				beginNavigation(loc); // navigation hasnt been cancelled, resume
+			}, 350); // need delay, or it wont be ran properly
+			Log.i(TAG, "onResume: resume navigation " + loc);
+		}
 	}
 	
 	@Override
@@ -155,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		}
 	}
 	
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -174,6 +220,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		super.onDestroy();
 		if(_mapView != null)
 			_mapView.onDestroy();
+		
+		if(!AppDataStore.getData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, false))
+			disableStepCounterService();
 	}
 	
 	@Override
@@ -183,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 			_mapView.onLowMemory();
 	}
 	
+	@SuppressLint("ScheduleExactAlarm")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -193,6 +243,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 			v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
 			return insets;
 		});
+		
+		if((Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && AppPermissions.hasPermission(this, AppPermissions.ALARMS)))
+			NotificationWorkerScheduler.scheduleDailyWork(getApplicationContext());
 		
 		// Initialize app data store
 		AppDataStore.initialize(getApplicationContext());
@@ -209,6 +262,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 			return;
 		}
 		
+		_qrActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+				new ActivityResultCallback<>() {
+					@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+					@Override
+					public void onActivityResult(ActivityResult result) {
+						var isScan = AppDataStore.getData(AppDataStore.QrPrefsKeys.STOREKEY, AppDataStore.QrPrefsKeys.DATAKEY_SUCCESS_SCAN, false);
+						Log.i(TAG, "onActivityResult: isScan: " + isScan);
+						if(!isScan)
+							return;
+						
+						AppDataStore.setData(AppDataStore.QrPrefsKeys.STOREKEY, AppDataStore.QrPrefsKeys.DATAKEY_SUCCESS_SCAN, false);
+						
+						var loc = AppDataStore.getData(AppDataStore.QrPrefsKeys.STOREKEY, AppDataStore.QrPrefsKeys.DATAKEY_NAVIGATE_LOCATION, "");
+						if (Objects.equals(loc, "")) {
+							return;
+						}
+						if (!AppPermissions.hasPermission(MainActivity.this, AppPermissions.LOCATION))
+							return;
+						AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_NAVIGATION_DESTINATION_LATLNG, loc);
+						AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, true);
+						Log.i(TAG, "onActivityResult: qrResult: " + loc);
+						_walkStartButton.postDelayed(() -> {
+							beginNavigation(loc);
+						}, 350); // need delay, or it wont be ran properly
+					}
+				});
+		
 		setupActivity();
 	}
 	
@@ -216,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		AppDataStore.setData(AppDataStore.SetupPrefsKeys.STOREKEY, AppDataStore.SetupPrefsKeys.DATAKEY_HAS_SETUP, false);
 		
 		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, false);
-		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_NAVIGATION_DESTINATION_LATLNG, "NULL");
+		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_NAVIGATION_DESTINATION_LATLNG, "");
 		
 		Intent intent = new Intent(this, SetupActivity.class);
 		startActivity(intent); // launch the setup activity, and close this activity
@@ -225,6 +305,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	
 	/// This should only be run, if the user has all permissions, and sensors activated
 	
+	@SuppressLint("MissingPermission")
 	private void setupActivity(){
 		if(_mapView != null){
 			return; // has setup
@@ -252,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		_mapView.getMapAsync(this);
 		
 		_walkStartButton = findViewById(R.id.startnew_button);
+		_stopNavigationButton = findViewById(R.id.stopnavi_button);
 		_statsButton = findViewById(R.id.chart_button);
 		_qrButton = findViewById(R.id.qrcode_button);
 		
@@ -262,7 +344,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		_helperTextView = findViewById(R.id.helper_text_display);
 		
 		_walkStartButton.setOnClickListener(l -> {
-			OnWalkButtonPressed();
+			if(!AppPermissions.hasPermission(this, AppPermissions.LOCATION))
+				return;
+			beginNavigation("");
+		});
+		
+		_stopNavigationButton.setOnClickListener(l -> {
+			if(!AppPermissions.hasPermission(this, AppPermissions.LOCATION))
+				return;
+			stopNavigation();
 		});
 		
 		_statsButton.setOnClickListener(l -> {
@@ -272,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		
 		_qrButton.setOnClickListener(l -> {
 			Intent intent = new Intent(this, QRActivity.class);
-			startActivity(intent);
+			_qrActivityLauncher.launch(intent);
 		});
 	}
 	
@@ -306,6 +396,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 				
 				}
 				
+				@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
 				@Override
 				public void onActionOk() {
 					AppPopupMenu.dismissPopupMenu();
@@ -429,33 +520,105 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		refreshZooming(true);
 	}
 	
-	private void OnWalkButtonPressed(){
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+	private void beginNavigation(String from){
 		if(_googleMap == null){
 			return;
 		}
 		_walkStartButton.setVisibility(View.INVISIBLE);
 		_zoomSeekbarLayout.setVisibility(View.INVISIBLE);
 		
+		_onResumeFlip = true;
+		
 		_helperTextView.setText(getString(R.string.main_usage_generation_in_progress));
 		
-		var animTime = 2000;
+		var animTime = 575;
 		_progressbar.setVisibility(View.VISIBLE);
 		_progressbar.setProgress(0, false);
 		_progressbar.setMax(100);
 		ObjectAnimator progressAnimator = ObjectAnimator.ofInt(_progressbar, "progress", 0, 100); // animate progressbar
 		progressAnimator.setDuration(animTime);
-		progressAnimator.setInterpolator(new FastOutSlowInInterpolator());
+		progressAnimator.setInterpolator(new FastOutLinearInInterpolator());
 		progressAnimator.start();
 		
-		var latlng = getRandomLocationInRange();
+		float systemScale = Settings.Global.getFloat(
+			getApplicationContext().getContentResolver(),
+			Settings.Global.ANIMATOR_DURATION_SCALE,
+			1.0f
+		);
+		
+		LatLng latlng;
+		if(Objects.equals(from, "")){
+			latlng = getRandomLocationInRange();
+		}
+		else{
+			latlng = new LatLng(Double.parseDouble(from.split(";")[0]), Double.parseDouble(from.split(";")[1]));
+		}
+		
+		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, true);
+		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_NAVIGATION_DESTINATION_LATLNG, latlng.latitude + ";" + latlng.longitude);
+		
+		refreshZooming(true);
 		
 		new Handler(Looper.getMainLooper()).postDelayed(() -> {
-			OnGeneratedLocation(latlng);
-			_bottomLayout.setVisibility(View.INVISIBLE);
-		}, animTime); // call after time passed
+			onGeneratedLocation(latlng);
+			//_bottomLayout.setVisibility(View.INVISIBLE);
+			_stopNavigationButton.setVisibility(View.VISIBLE);
+			_helperTextView.setText(getString(R.string.main_usage_helper_stop));
+			_progressbar.setVisibility(View.INVISIBLE);
+			enableStepCounterService();
+		}, (long)(animTime * systemScale)); // call after time passed
 	}
 	
-	private void OnGeneratedLocation(LatLng latlng){
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+	private void stopNavigation(){
+		disableStepCounterService();
+		_onResumeFlip = false;
+		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, false);
+		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_NAVIGATION_DESTINATION_LATLNG, "");
+		
+		_googleMap.clear();
+		refreshZooming(true);
+		
+		_stopNavigationButton.setVisibility(View.INVISIBLE);
+		
+		var animTime = 450;
+		_progressbar.setVisibility(View.VISIBLE);
+		_progressbar.setProgress(1, false);
+		_progressbar.setMax(100);
+		ObjectAnimator progressAnimator = ObjectAnimator.ofInt(_progressbar, "progress", 100, 0); // animate progressbar
+		progressAnimator.setDuration(animTime);
+		progressAnimator.setInterpolator(new FastOutLinearInInterpolator());
+		progressAnimator.start();
+		
+		float systemScale = Settings.Global.getFloat(
+			getApplicationContext().getContentResolver(),
+			Settings.Global.ANIMATOR_DURATION_SCALE,
+			1.0f
+		);
+		
+		new Handler(Looper.getMainLooper()).postDelayed(() -> {
+			_walkStartButton.setVisibility(View.VISIBLE);
+			_zoomSeekbarLayout.setVisibility(View.VISIBLE);
+			_progressbar.setVisibility(View.INVISIBLE);
+			_helperTextView.setText(getString(R.string.main_usage_helper));
+		}, (long)(animTime * systemScale)); // call after time passed
+	}
+	
+	private void enableStepCounterService(){
+		_stepServiceIntent = new Intent(this, NavigationStepsCounterService.class);
+		startService(_stepServiceIntent);
+		bindService(_stepServiceIntent, _stepServiceConnection, BIND_AUTO_CREATE);
+	}
+	
+	private void disableStepCounterService(){
+		stopService(_stepServiceIntent);
+		unbindService(_stepServiceConnection);
+	}
+	
+	private void onGeneratedLocation(LatLng latlng){
+		_googleMap.clear();
+		_drawnCircle.remove(); // cleanse map view
 		_progressbar.setVisibility(View.INVISIBLE);
 		_progressbar.setProgress(0, false);
 		_googleMap.addMarker(new MarkerOptions()

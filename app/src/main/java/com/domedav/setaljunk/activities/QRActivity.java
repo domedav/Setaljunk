@@ -1,10 +1,9 @@
-package com.domedav.setaljunk;
+package com.domedav.setaljunk.activities;
 
 import android.Manifest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
-import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -31,7 +30,10 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.domedav.setaljunk.R;
 import com.domedav.setaljunk.permissions.AppPermissions;
+import com.domedav.setaljunk.popupmenus.AppPopupMenu;
 import com.domedav.setaljunk.qrcode.QrCodeGenerator;
 import com.domedav.setaljunk.sharedpreferences.AppDataStore;
 import com.domedav.setaljunk.views.SquareSurfaceView;
@@ -413,6 +415,7 @@ public class QRActivity extends AppCompatActivity {
 					}
 					String actualValue = rawValue.replace(QrCodeGenerator.APPVALIDATION_QR, "");
 					Log.i(TAG, "scanQRCode: found valid: " + actualValue);
+					AppDataStore.setData(AppDataStore.QrPrefsKeys.STOREKEY, AppDataStore.QrPrefsKeys.DATAKEY_SUCCESS_SCAN, true);
 					onQRScanned(actualValue);
 					return;
 				}
@@ -421,6 +424,7 @@ public class QRActivity extends AppCompatActivity {
 	}
 	
 	private void onQRScanned(String qrValue){
-	finish();
+		AppDataStore.setData(AppDataStore.QrPrefsKeys.STOREKEY, AppDataStore.QrPrefsKeys.DATAKEY_NAVIGATE_LOCATION, qrValue);
+		finish();
 	}
 }

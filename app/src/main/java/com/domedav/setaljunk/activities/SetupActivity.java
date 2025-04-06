@@ -1,5 +1,6 @@
-package com.domedav.setaljunk;
+package com.domedav.setaljunk.activities;
 
+import android.app.AlarmManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -13,6 +14,8 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.domedav.setaljunk.R;
 import com.domedav.setaljunk.permissions.AppPermissions;
 import com.domedav.setaljunk.sharedpreferences.AppDataStore;
 import com.google.android.material.button.MaterialButton;
@@ -123,6 +126,13 @@ public class SetupActivity extends AppCompatActivity {
 		
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
 			_stepsLayout.setVisibility(View.GONE); // android 9 or bellow auto grants us this permission
+		}
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			AlarmManager alarmManager = getSystemService(AlarmManager.class);
+			if (!alarmManager.canScheduleExactAlarms()) {
+				startActivity(new Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM));
+			}
 		}
 		
 		_viewFlipper.setInAnimation(this, android.R.anim.fade_in);

@@ -9,7 +9,7 @@ import androidmads.library.qrgenearator.QRGEncoder;
 
 public class QrCodeGenerator {
 	/// This string is used to identify the scanned QR code, that it is in fact from the app (Base64)
-	public static final String APPVALIDATION_QR = "U8OpdMOhbGp1bmtBcHBRUkNvZGU=";
+	public static final String APPVALIDATION_QR = "qrVer1_U8OpdMOhbGp1bmtBcHBRUkNvZGU=";
 	
 	public static Bitmap generateQRCode(Context context, String from){
 		QRGEncoder encoder = new QRGEncoder(from, null, QRGContents.Type.TEXT, dpToPx(context, 344));

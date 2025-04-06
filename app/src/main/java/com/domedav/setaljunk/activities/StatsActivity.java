@@ -1,4 +1,4 @@
-package com.domedav.setaljunk;
+package com.domedav.setaljunk.activities;
 
 import android.os.Bundle;
 
@@ -9,8 +9,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.domedav.setaljunk.R;
 import com.domedav.setaljunk.sharedpreferences.AppDataStore;
 import com.google.android.material.textview.MaterialTextView;
+
+import java.text.DecimalFormat;
 
 public class StatsActivity extends AppCompatActivity {
 	
@@ -39,14 +42,14 @@ public class StatsActivity extends AppCompatActivity {
 		_totalCaloriesText = findViewById(R.id.total_calories_display);
 		_totalWalkedDistance = findViewById(R.id.total_distance_display);
 		
-		var totalSteps = AppDataStore.getData(AppDataStore.StatsPrefsKeys.STOREKEY, AppDataStore.StatsPrefsKeys.DATAKEY_TOTAL_STEPS, 0);
+		var totalSteps = AppDataStore.getData(AppDataStore.StatsPrefsKeys.STOREKEY, AppDataStore.StatsPrefsKeys.DATAKEY_TOTAL_STEPS, 0f);
 		
 		// unisex data, minimalistic
-		var totalDistance = totalSteps * 0.0007; //km
-		var totalCalories = totalSteps * 0.04; //kcal
+		var totalDistance = totalSteps * 0.0007f; //km
+		var totalCalories = totalSteps * 0.04f; //kcal
 		
-		_totalStepsText.setText(getString(R.string.stats_steps_total_string, totalSteps + ""));
-		_totalCaloriesText.setText(getString(R.string.stats_calories_total_string, totalCalories + ""));
-		_totalWalkedDistance.setText(getString(R.string.stats_distance_total_string, totalDistance + ""));
+		_totalStepsText.setText(getString(R.string.stats_steps_total_string, totalSteps.intValue() + ""));
+		_totalCaloriesText.setText(getString(R.string.stats_calories_total_string, new DecimalFormat("#.##").format(totalCalories)));
+		_totalWalkedDistance.setText(getString(R.string.stats_distance_total_string, new DecimalFormat("#.####").format(totalDistance)));
 	}
 }

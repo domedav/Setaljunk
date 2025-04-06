@@ -1,4 +1,4 @@
-package com.domedav.setaljunk;
+package com.domedav.setaljunk.popupmenus;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.domedav.setaljunk.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 

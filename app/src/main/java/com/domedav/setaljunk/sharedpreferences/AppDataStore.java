@@ -13,16 +13,29 @@ public class AppDataStore {
 	}
 	
 	public static final class MainPrefsKeys{
-		public static final String STOREKEY = "MainPrefsKeys_SetupPrefs";
+		public static final String STOREKEY = "MainPrefsKeys_MainPrefs";
 		public static final String DATAKEY_RECENT_MAP_DISTANCE = "MainPrefsKeys_recentMapDistance";
 		public static final String DATAKEY_IS_NAVIGATING = "MainPrefsKeys_isNavigating";
 		public static final String DATAKEY_NAVIGATION_DESTINATION_LATLNG = "MainPrefsKeys_navigationDestinationLatLng";
 	}
 	
 	public static final class StatsPrefsKeys{
-		public static final String STOREKEY = "SetupPrefsKeys_StatsPrefs";
+		public static final String STOREKEY = "StatsPrefsKeys_StatsPrefs";
 		
 		public static final String DATAKEY_TOTAL_STEPS = "SetupPrefsKeys_totalSteps";
+	}
+	
+	public static final class QrPrefsKeys{
+		public static final String STOREKEY = "QrPrefsKeys_QrPrefs";
+		
+		public static final String DATAKEY_NAVIGATE_LOCATION = "QrPrefsKeys_navigateLocation";
+		public static final String DATAKEY_SUCCESS_SCAN = "QrPrefsKeys_scanSuccess";
+	}
+	
+	public static final class StepServiceKeys{
+		public static final String STOREKEY = "StepServiceKeys_StepService";
+		
+		public static final String DATAKEY_SENSOR_STEPS = "StepServiceKeys_sensorSteps";
 	}
 	
 	static Context _AppContext;

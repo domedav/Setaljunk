@@ -19,6 +19,7 @@
 	<string name="main_gps_missing_services">Kérlek kapcsold be az internetet, és a GPS-t!</string>
 	<string name="main_usage_helper">Válaszd ki a sétálni kívánt távolságot, majd nyomd meg a séta indítása gombot.</string>
 	<string name="main_usage_generation_in_progress">Várj egy pillanatot!\nHamarosan már úton is lehetsz.</string>
+	<string name="main_usage_helper_stop">Nyomd meg a gombot, ha mégse szeretnél sétálni.</string>
 	<string name="main_seekbar_min_distance">100m</string>
 	<string name="main_seekbar_max_distance">5000m</string>
 	<string name="main_popup_no_sensory_header">Hiányzó Funkciók</string>
@@ -30,7 +31,7 @@
 	<string name="stats_steps_total_string">%1$sdb</string>
 	<string name="stats_calories_total">Elégetett kalóriák:</string>
 	<string name="stats_calories_total_string">%1$skcal</string>
-	<string name="stats_distance_total">Megjárt méterek:</string>
+	<string name="stats_distance_total">Megjárt távolság:</string>
 	<string name="stats_distance_total_string">%1$skm</string>
 	<string name="stats_total_header">Összesített adataid:</string>
 	<string name="stats_view_daily_button">Alkalmi bontás</string>
@@ -44,4 +45,9 @@
 	<string name="qr_popup_no_camera_description">Kérlek adj hozzáférést az alkalmazásnak a kamerához, hogy be tudd olvasni a QR-kódot</string>
 	<string name="qr_popup_no_camera_no">Vissza</string>
 	<string name="qr_popup_no_camera_yes">Engedélyezés</string>
+	
+	<string name="step_service_notification_text">Lépészámláló</string>
+	
+	<string name="daily_notification_text">Ideje Sétálni</string>
+	<string name="daily_notification_textsub">Itt az ideje a mai sétálásnak!</string>
 </resources>
