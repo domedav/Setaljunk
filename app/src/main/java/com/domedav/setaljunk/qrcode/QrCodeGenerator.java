@@ -12,7 +12,7 @@ public class QrCodeGenerator {
 	public static final String APPVALIDATION_QR = "qrVer1_U8OpdMOhbGp1bmtBcHBRUkNvZGU=";
 	
 	public static Bitmap generateQRCode(Context context, String from){
-		QRGEncoder encoder = new QRGEncoder(from, null, QRGContents.Type.TEXT, dpToPx(context, 344));
+		QRGEncoder encoder = new QRGEncoder(APPVALIDATION_QR + from, null, QRGContents.Type.TEXT, dpToPx(context, 344));
 		int colorPrimary = resolveColor(context, com.google.android.material.R.attr.colorPrimary);
 		encoder.setColorBlack(android.graphics.Color.TRANSPARENT); // make qr code look material you
 		encoder.setColorWhite(colorPrimary);

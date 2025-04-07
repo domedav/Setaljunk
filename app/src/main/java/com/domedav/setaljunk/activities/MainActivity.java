@@ -3,9 +3,11 @@ package com.domedav.setaljunk.activities;
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.location.Criteria;
 import android.location.GnssStatus;
@@ -39,14 +41,18 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
-
 import com.domedav.setaljunk.R;
 import com.domedav.setaljunk.location.LocationGeneration;
+import com.domedav.setaljunk.location.LocationRequest;
 import com.domedav.setaljunk.permissions.AppPermissions;
 import com.domedav.setaljunk.popupmenus.AppPopupMenu;
 import com.domedav.setaljunk.services.NavigationStepsCounterService;
 import com.domedav.setaljunk.sharedpreferences.AppDataStore;
 import com.domedav.setaljunk.workers.NotificationWorkerScheduler;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -58,9 +64,11 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textview.MaterialTextView;
-
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, SeekBar.OnSeekBarChangeListener {
@@ -69,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	
 	private MapView _mapView;
 	private GoogleMap _googleMap;
-	private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 	
 	private static final int MAP_MIN_DISTANCE = 100;
 	private static final int MAP_MAX_DISTANCE = 5000;
@@ -100,6 +107,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	
 	private ActivityResultLauncher<Intent> _qrActivityLauncher;
 	
+	private FusedLocationProviderClient _fusedLocationClient;
+	private LocationCallback _locationCallback = new LocationCallback() {
+		@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+		@Override
+		public void onLocationResult(@NonNull LocationResult locationResult) {
+			for (Location location : locationResult.getLocations()) {
+				Log.i(TAG, "onLocationResult: ");
+				if(AppPermissions.hasPermission(MainActivity.this, AppPermissions.LOCATION)){
+					_lastLocation = location; // Update with latest location
+					refreshZooming(true);
+				}
+			}
+		}
+	};
+	private Polyline _currentRoute;
+	
 	private boolean _onResumeFlip = false;
 	
 	private NavigationStepsCounterService _stepService;
@@ -116,6 +139,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		@Override
 		public void onServiceDisconnected(ComponentName arg0) {
 		
+		}
+	};
+	
+	private final BroadcastReceiver _stepEventReciever = new BroadcastReceiver() {
+		@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+		@Override
+		public void onReceive(Context context, @NonNull Intent intent) {
+			if (intent.getAction() != null && intent.getAction().equals(NavigationStepsCounterService.ACTION_STEP_EVENT)) {
+				// recieved a step movement
+				refreshZooming(true); // align map center to user location
+			}
 		}
 	};
 	
@@ -181,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 			}, 350); // need delay, or it wont be ran properly
 			Log.i(TAG, "onResume: resume navigation " + loc);
 		}
+		
+		// register reciever
+		registerReceiver(_stepEventReciever, new IntentFilter(NavigationStepsCounterService.ACTION_STEP_EVENT), "com.domedav.permission.STEP_BROADCAST", null, Context.RECEIVER_EXPORTED);
 	}
 	
 	@Override
@@ -197,6 +234,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		if(locationManager != null && _gpsCallback != null){
 			locationManager.unregisterGnssStatusCallback(_gpsCallback);
+		}
+		
+		if(_stepEventReciever != null)
+			unregisterReceiver(_stepEventReciever);
+		
+		if (_fusedLocationClient != null && _locationCallback != null) {
+			_fusedLocationClient.removeLocationUpdates(_locationCallback);
 		}
 	}
 	
@@ -243,7 +287,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 			return insets;
 		});
 		
-		NotificationWorkerScheduler.scheduleDailyWork(getApplicationContext());
+		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+			NotificationWorkerScheduler.scheduleDailyWork(getApplicationContext()); // can only schedule, if we have perms, but schedule anyways on older systems, as it requires no perms
+		else if (AppPermissions.hasPermission(this, AppPermissions.NOTIFICATIONS))
+			NotificationWorkerScheduler.scheduleDailyWork(getApplicationContext());
 		
 		// Initialize app data store
 		AppDataStore.initialize(getApplicationContext());
@@ -362,6 +409,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 			Intent intent = new Intent(this, QRActivity.class);
 			_qrActivityLauncher.launch(intent);
 		});
+		
+		_fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 	}
 	
 	private boolean displayPopupNoInternetOrGPS(){
@@ -446,6 +495,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		refreshZooming(true);
 	}
 	
+	private void drawNavigationRoute(LatLng origin, @NonNull LatLng destination) {
+		Log.i(TAG, "drawNavigationRoute: origin: " + origin + " - destination: " + destination);
+		new Thread(() -> {
+			try {
+				LocationRequest.fetchRouteDataAsync(this, origin, destination).thenApply(json -> {
+					try {
+						return LocationRequest.parseRoute(json);
+					} catch (Exception e) {
+						Log.e(TAG, "Error parsing route data: " + e.getMessage());
+						throw new RuntimeException(e);
+					}
+				}).thenAccept(path -> runOnUiThread(() -> {
+					if (_currentRoute == null && path != null)
+						_currentRoute = _googleMap.addPolyline(new PolylineOptions()
+								.addAll(Arrays.asList(path))
+								.width(12f)
+								.color(getApplicationContext().getColor(R.color.map_border)));
+				})).exceptionally(e -> {
+					Log.e(TAG, "drawNavigationRoute: error on fetching json data", e);
+					return null;
+				});
+			} catch (Exception e) {
+				Log.e(TAG, "Routing error: " + e.getMessage());
+			}
+		}).start();
+	}
+	
 	/// Auto aligns the camera and the camera to match the current preferences
 	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
 	private void refreshZooming(boolean refreshLocation){
@@ -460,14 +536,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 				_drawnCircle = null;
 			}
 		}
+		float bearing = 0; // rotation of device
+		if(_lastLocation != null && _lastLocation.hasBearing() && AppDataStore.getData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, false)){
+			bearing = _lastLocation.getBearing();
+		}
 		var cameraPosition = new CameraPosition.Builder()
 				.target(_lastLatLng)
 				.zoom(getGoogleMapsZoomLevel(_lastLatLng.latitude)) // Zoom level
 				.tilt(0) // No tilt, topdown view
+				.bearing(bearing)
 				.build();
 		_googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 		
-		if(_drawnCircle == null){
+		if(_drawnCircle == null && !AppDataStore.getData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, false)){
 			_drawnCircle = _googleMap.addCircle(new CircleOptions()
 					.center(_lastLatLng)
 					.radius(_currentMeters)
@@ -476,7 +557,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 					.fillColor(getApplicationContext().getColor(R.color.map_background)) // more transparent fill color
 			);
 		}
-		else{
+		else if(!AppDataStore.getData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_IS_NAVIGATING, false)){
 			_drawnCircle.setRadius(_currentMeters);
 		}
 		
@@ -558,6 +639,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		
 		refreshZooming(true);
 		
+		com.google.android.gms.location.LocationRequest locationRequest = new com.google.android.gms.location.LocationRequest()
+				.setInterval(3000)
+				.setFastestInterval(1000)
+				.setPriority(com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY)
+				.setWaitForAccurateLocation(true);
+		if(AppPermissions.hasPermission(this, AppPermissions.LOCATION))
+			_fusedLocationClient.requestLocationUpdates(locationRequest, _locationCallback, Looper.getMainLooper());
+		
 		new Handler(Looper.getMainLooper()).postDelayed(() -> {
 			onGeneratedLocation(latlng);
 			//_bottomLayout.setVisibility(View.INVISIBLE);
@@ -576,6 +665,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 		AppDataStore.setData(AppDataStore.MainPrefsKeys.STOREKEY, AppDataStore.MainPrefsKeys.DATAKEY_NAVIGATION_DESTINATION_LATLNG, "");
 		
 		_googleMap.clear();
+		if(_currentRoute != null){
+			_currentRoute.remove();
+			_currentRoute = null;
+		}
 		refreshZooming(true);
 		
 		_stopNavigationButton.setVisibility(View.INVISIBLE);
@@ -619,12 +712,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 	
 	private void onGeneratedLocation(LatLng latlng){
 		_googleMap.clear();
-		_drawnCircle.remove(); // cleanse map view
+		if(_drawnCircle != null)
+			_drawnCircle.remove(); // cleanse map view
 		_progressbar.setVisibility(View.INVISIBLE);
 		_progressbar.setProgress(0, false);
 		_googleMap.addMarker(new MarkerOptions()
 				.position(latlng)
 		);
+		drawNavigationRoute(latlng, _lastLatLng);
 	}
 	
 	@NonNull

@@ -200,7 +200,6 @@ public class SetupActivity extends AppCompatActivity {
 	
 	private boolean hasAllNeededPerms(){
 		return AppPermissions.hasPermission(this, AppPermissions.LOCATION) &&
-				(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && AppPermissions.hasPermission(this, AppPermissions.ACTIVITY_SENSOR)) &&
-				(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && AppPermissions.hasPermission(this, AppPermissions.NOTIFICATIONS));
+				(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && AppPermissions.hasPermission(this, AppPermissions.ACTIVITY_SENSOR));
 	}
 }

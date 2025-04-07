@@ -1,3 +1,14 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(localPropertiesFile.inputStream())
+    }
+}
+
+val apiKey: String = localProperties.getProperty("API_KEY") ?: ""
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -13,6 +24,8 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+
+        manifestPlaceholders["apiKey"] = apiKey
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,6 +56,9 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+    implementation(libs.android.maps.utils)
+    implementation(libs.okhttp)
     implementation(libs.qrgenerator)
     implementation(libs.barcode.scanning)
     implementation(libs.androidx.work.runtime)

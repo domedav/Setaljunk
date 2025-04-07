@@ -20,6 +20,8 @@ import com.domedav.setaljunk.R;
 import com.domedav.setaljunk.sharedpreferences.AppDataStore;
 
 public class NavigationStepsCounterService extends Service implements SensorEventListener {
+	public static final String ACTION_STEP_EVENT = "com.domedav.ACTION_STEP_EVENT";
+	
 	private static final String TAG = "NavigationStepsCounterService";
 	private static final int STEP_SERVICE_ID = 101;
 	private static final String CHANNEL_ID = "step_counter_channel";
@@ -32,6 +34,13 @@ public class NavigationStepsCounterService extends Service implements SensorEven
 		public NavigationStepsCounterService getService() {
 			return NavigationStepsCounterService.this;
 		}
+	}
+	
+	private void sendAppBroadcast(){
+		Intent intent = new Intent(ACTION_STEP_EVENT);
+		
+		// limit broadcast to permission
+		sendBroadcast(intent, "com.domedav.permission.STEP_BROADCAST");
 	}
 	
 	@Override
@@ -118,6 +127,8 @@ public class NavigationStepsCounterService extends Service implements SensorEven
 		var newSteps = currentSteps - lastSteps;
 		var oldSteps = AppDataStore.getData(AppDataStore.StatsPrefsKeys.STOREKEY, AppDataStore.StatsPrefsKeys.DATAKEY_TOTAL_STEPS, 0f);
 		AppDataStore.setData(AppDataStore.StatsPrefsKeys.STOREKEY, AppDataStore.StatsPrefsKeys.DATAKEY_TOTAL_STEPS, oldSteps + newSteps);
+		
+		sendAppBroadcast(); // broadcast movement, to sync with mapview
 	}
 	
 	@Override
