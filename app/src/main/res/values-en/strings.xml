@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Lets walk</string>
+	
+	<string name="setup_page1_header">Description</string>
+	<string name="setup_page1_description">This apps purpose is to encourage you to do daily walking exercise.\nThat is why its going to notify you every day, and you get to chose how much you want to walk.\nThe app tracks your movement data, so you will get to know about everything.</string>
+	<string name="setup_proceed_description">Before you get to use the app, you need to give some must permissions.</string>
+	<string name="setup_next_button">Next</string>
+	
+	<string name="setup_give_perms">Give</string>
+	<string name="setup_page2_header">Permissions</string>
+	<string name="setup_perm_gps">Location</string>
+	<string name="setup_perm_gps_description">This is needed, because without this, the app would have no clue where you are.</string>
+	<string name="setup_perm_camera">Camera</string>
+	<string name="setup_perm_camera_description">This is needed, so you can scan QR-codes, shared by your friends.</string>
+	<string name="setup_perm_optional">(Optional)</string>
+	<string name="setup_perm_notification">Notifications</string>
+	<string name="setup_perm_notification_description">This is needed, so that the app can notify you daily, to move.</string>
+	<string name="setup_perm_steps">Step Counter</string>
+	<string name="setup_perm_steps_description">This is needed, so that the app knows how many steps have you walked.</string>
+	
+	<string name="main_gps_missing_services">Please turn on the internet and the GPS!</string>
+	<string name="main_usage_helper">Select the distance you want to walk, then press the start button.</string>
+	<string name="main_usage_generation_in_progress">Hold up for a sec!\nYou can be on your way soon.</string>
+	<string name="main_usage_helper_stop">Press the button, if you no longer want to walk.</string>
+	<string name="main_seekbar_min_distance">100m</string>
+	<string name="main_seekbar_max_distance">5000m</string>
+	<string name="main_popup_no_sensory_header">Missing Functionality</string>
+	<string name="main_popup_no_sensory_description">Please turn on the internet connectivity and the GPS to be able to use the application!</string>
+	<string name="main_popup_no_sensory_action_ok">Ok</string>
+	
+	<string name="stats_header">Statistics</string>
+	<string name="stats_steps_total">Steps:</string>
+	<string name="stats_steps_total_string">%1$s steps</string>
+	<string name="stats_calories_total">Burnt calories:</string>
+	<string name="stats_calories_total_string">%1$skcal</string>
+	<string name="stats_distance_total">Traveled distance:</string>
+	<string name="stats_distance_total_string">%1$skm</string>
+	<string name="stats_total_header">Overall data:</string>
+	<string name="stats_view_daily_button">Daily data</string>
+	
+	<string name="qr_header">Share</string>
+	<string name="qr_scanpage_otherqr_header">Scan the QR code from your friends phone!</string>
+	<string name="qr_scanpage_otherqr_help">If you want to share a QR code, start the navigaion.</string>
+	<string name="qr_scanpage_myqr_header">Show this QR code to your friend!</string>
+	<string name="qr_scanpage_myqr_help">If you want to scan QR codes, stop the navigation.</string>
+	<string name="qr_popup_no_camera_header">Camera Permission</string>
+	<string name="qr_popup_no_camera_description">Please grant access to the camera, to be able to scan QR codes</string>
+	<string name="qr_popup_no_camera_no">Back</string>
+	<string name="qr_popup_no_camera_yes">Grant</string>
+	
+	<string name="step_service_notification_text">Steps Counter</string>
+	
+	<string name="daily_notification_text">It is time for a walk</string>
+	<string name="daily_notification_textsub">It is time for your daily walking!</string>
+</resources>

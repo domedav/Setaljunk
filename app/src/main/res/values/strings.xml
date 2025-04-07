@@ -2,7 +2,7 @@
 	<string name="app_name">Sétáljunk</string>
 	
 	<string name="setup_page1_header">Leírás</string>
-	<string name="setup_page1_description">Ennek az alkalmazásnak az a lényege, hogy serkentse a napi mozgásodat.\nÍgy minden nap fog neked szólni, és te eltudod dönteni mennyit szeretnél az adott nap sétálni.\nAz app méri a te mozgási adataidat, így mindent nyomon tudsz követni.</string>
+	<string name="setup_page1_description">Ennek az alkalmazásnak az a lényege, hogy serkentse a napi mozgásodat.\nÍgy minden nap fog neked szólni és te eltudod dönteni mennyit szeretnél az adott nap sétálni.\nAz app méri a te mozgási adataidat, így mindent nyomon tudsz követni.</string>
 	<string name="setup_proceed_description">Viszont mielőtt használhatnád az appot, meg kell adnod néhány engedélyt.</string>
 	<string name="setup_next_button">Tovább</string>
 	
@@ -18,14 +18,14 @@
 	<string name="setup_perm_steps">Lépésszámláló</string>
 	<string name="setup_perm_steps_description">Erre az engedélyre azért van szükség, hogy az app tudja, mennyi lépést tettél meg.</string>
 	
-	<string name="main_gps_missing_services">Kérlek kapcsold be az internetet, és a GPS-t!</string>
+	<string name="main_gps_missing_services">Kérlek kapcsold be az internetet és a GPS-t!</string>
 	<string name="main_usage_helper">Válaszd ki a sétálni kívánt távolságot, majd nyomd meg a séta indítása gombot.</string>
 	<string name="main_usage_generation_in_progress">Várj egy pillanatot!\nHamarosan már úton is lehetsz.</string>
 	<string name="main_usage_helper_stop">Nyomd meg a gombot, ha mégse szeretnél sétálni.</string>
 	<string name="main_seekbar_min_distance">100m</string>
 	<string name="main_seekbar_max_distance">5000m</string>
 	<string name="main_popup_no_sensory_header">Hiányzó Funkciók</string>
-	<string name="main_popup_no_sensory_description">Kérlek kapcsold be az internet elérést, és a GPS funkciót, hogy tudd használni az alkalmazást!</string>
+	<string name="main_popup_no_sensory_description">Kérlek kapcsold be az internet elérést és a GPS funkciót, hogy tudd használni az alkalmazást!</string>
 	<string name="main_popup_no_sensory_action_ok">Ok</string>
 	
 	<string name="stats_header">Statisztika</string>
