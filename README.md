@@ -18,7 +18,7 @@ Az appot nem tervezem továbbfejleszteni a kellőnél jobban, viszont ha van rá
 
 ### Letöltés
 - Az appot letudod tölteni a [Release](https://github.com/domedav/Setaljunk/releases/tag/v1.0) oldalról.
-- Illetve a [Play Áruház]()-ból.
+- Illetve a [Play Áruház](https://play.google.com/store/apps/details?id=com.domedav.setaljunk)-ból.
 
 ### Ha buildelni akarod az appot:
 - A ```local.properties``` fileba megkell adnod egy api kulcsot ```API_KEY=SajátGoogleApiKey```
